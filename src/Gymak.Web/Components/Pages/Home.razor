@@ -1,163 +1,247 @@
 @page "/"
+@using System.Security.Claims
 @using Gymak.Application.Services
 @using Gymak.Application.DTOs
 @using Gymak.Domain.Enums
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IUserService UserService
 @inject ISubscriptionService SubscriptionService
 @inject IProgressLogService ProgressLogService
 @inject IPaymentService PaymentService
+@inject AuthenticationStateProvider AuthStateProvider
 @rendermode InteractiveServer
 
 <PageTitle>Dashboard — Gymak Fitness OS</PageTitle>
 
-<!-- Page Header -->
-<div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-        <h1 class="fw-bold mb-1" style="font-size: 1.75rem; color: #f8fafc;">
-            <i class="bi bi-grid-1x2-fill text-primary me-2" style="font-size: 1.5rem;"></i>Dashboard
-        </h1>
-        <p class="text-muted mb-0" style="font-size: 0.9rem;">Welcome back. Here's your gym performance overview.</p>
-    </div>
-    <div class="d-none d-md-block px-3 py-2 rounded-3 border border-secondary border-opacity-10 text-muted" style="font-size: 0.8rem; background: rgba(255,255,255,0.03);">
-        <i class="bi bi-clock me-1 text-primary"></i>
-        @DateTime.Now.ToString("dddd, MMMM dd yyyy · HH:mm")
-    </div>
-</div>
-
 @if (isLoading)
 {
-    <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem; border-width: 3px;"></div>
-        <p class="text-muted mt-3">Loading dashboard data…</p>
+    <div class="d-flex flex-column align-items-center justify-content-center py-5 min-vh-50">
+        <div class="spinner-border text-info" role="status" style="width: 3.5rem; height: 3.5rem; border-width: 3px;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-muted mt-3 fw-medium" style="font-size: 0.95rem;">Initializing Gymak Control Center...</p>
     </div>
 }
 else
 {
-    <!-- Stat Cards Row -->
+    <!-- Hero Welcome Banner -->
+    <div class="hero-card p-4 p-md-5 mb-4">
+        <div class="row align-items-center position-relative" style="z-index: 2;">
+            <div class="col-lg-8">
+                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-info bg-opacity-10 border border-info border-opacity-20 text-info small mb-3">
+                    <span class="badge bg-info rounded-circle p-1 me-1"><span class="visually-hidden">Live</span></span>
+                    <span class="fw-semibold">Gymak Fitness OS v2.0</span>
+                    <span class="text-white-50">·</span>
+                    <span>System Active</span>
+                </div>
+                <h2 class="fw-extrabold text-white tracking-tight mb-2 display-6">
+                    Welcome back, <span class="text-transparent bg-clip-text" style="background: linear-gradient(135deg, #38bdf8 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">@(userName ?? "Athlete")</span>! 👋
+                </h2>
+                <p class="text-muted fs-6 mb-0" style="max-width: 620px;">
+                    Here is your real-time fitness performance overview, member subscriptions status, and revenue analytics for today.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                <div class="d-inline-flex flex-column text-start text-lg-end p-3 rounded-4 bg-dark bg-opacity-60 border border-white border-opacity-10">
+                    <span class="text-muted small fw-medium mb-1"><i class="bi bi-clock me-1 text-info"></i>Current Time</span>
+                    <span class="fw-bold text-white fs-5 font-monospace">@DateTime.Now.ToString("HH:mm:ss")</span>
+                    <span class="text-white-50 small">@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4 KPI Stat Cards Row -->
     <div class="row g-4 mb-4">
+        <!-- Total Members Card -->
         <div class="col-6 col-xl-3">
-            <div class="stat-card h-100">
+            <div class="stat-card stat-card-cyan h-100">
                 <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div class="stat-icon-wrapper stat-icon-primary">
+                    <div class="stat-icon-box icon-box-cyan">
                         <i class="bi bi-people-fill"></i>
                     </div>
-                    <span class="badge rounded-pill px-2 py-1" style="background: rgba(16,185,129,0.12); color: #34d399; font-size: 0.72rem; font-weight: 600;">
-                        <i class="bi bi-arrow-up me-1"></i>Active
+                    <span class="badge badge-neon-cyan px-2.5 py-1 rounded-pill small fw-semibold">
+                        <i class="bi bi-arrow-up-short"></i>Active Users
                     </span>
                 </div>
                 <div class="mt-2">
-                    <div class="fw-bold mb-1" style="font-size: 2rem; line-height: 1; color: #f8fafc;">@totalMembers</div>
-                    <div class="text-muted" style="font-size: 0.85rem;">Total Members</div>
+                    <div class="fw-extrabold text-white mb-1" style="font-size: 2.25rem; line-height: 1;">@totalMembers</div>
+                    <div class="text-muted small fw-medium">Total Registered Members</div>
                 </div>
-                <div class="mt-3 pt-3 border-top border-secondary border-opacity-10">
-                    <small class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-person-badge me-1 text-primary"></i>Registered users in system</small>
+                <div class="mt-3 pt-3 border-top border-white border-opacity-10 d-flex align-items-center justify-content-between text-muted small">
+                    <span><i class="bi bi-person-check-fill text-info me-1"></i>Member Roster</span>
+                    <a href="members" class="text-info text-decoration-none font-monospace fs-7">Manage →</a>
                 </div>
             </div>
         </div>
 
+        <!-- Monthly Revenue Card -->
         <div class="col-6 col-xl-3">
-            <div class="stat-card h-100">
+            <div class="stat-card stat-card-emerald h-100">
                 <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div class="stat-icon-wrapper stat-icon-success">
-                        <i class="bi bi-cash-coin"></i>
+                    <div class="stat-icon-box icon-box-emerald">
+                        <i class="bi bi-cash-stack"></i>
                     </div>
-                    <span class="badge rounded-pill px-2 py-1" style="background: rgba(59,130,246,0.12); color: #60a5fa; font-size: 0.72rem; font-weight: 600;">
-                        <i class="bi bi-calendar2-month me-1"></i>Monthly
+                    <span class="badge badge-neon-emerald px-2.5 py-1 rounded-pill small fw-semibold">
+                        <i class="bi bi-calendar-check"></i>This Month
                     </span>
                 </div>
                 <div class="mt-2">
-                    <div class="fw-bold mb-1" style="font-size: 2rem; line-height: 1; color: #f8fafc;">$@monthlyRevenue.ToString("N0")</div>
-                    <div class="text-muted" style="font-size: 0.85rem;">Revenue This Month</div>
+                    <div class="fw-extrabold text-white mb-1" style="font-size: 2.25rem; line-height: 1;">$@monthlyRevenue.ToString("N0")</div>
+                    <div class="text-muted small fw-medium">Total Revenue Logged</div>
                 </div>
-                <div class="mt-3 pt-3 border-top border-secondary border-opacity-10">
-                    <small class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-credit-card me-1 text-success"></i>From completed payments</small>
+                <div class="mt-3 pt-3 border-top border-white border-opacity-10 d-flex align-items-center justify-content-between text-muted small">
+                    <span><i class="bi bi-credit-card-fill text-emerald me-1"></i>Completed Payments</span>
+                    <a href="subscriptions" class="text-emerald text-decoration-none font-monospace fs-7">History →</a>
                 </div>
             </div>
         </div>
 
+        <!-- Active Plans Card -->
         <div class="col-6 col-xl-3">
-            <div class="stat-card h-100">
+            <div class="stat-card stat-card-amber h-100">
                 <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div class="stat-icon-wrapper stat-icon-warning">
-                        <i class="bi bi-card-checklist"></i>
+                    <div class="stat-icon-box icon-box-amber">
+                        <i class="bi bi-lightning-charge-fill"></i>
                     </div>
-                    <span class="badge rounded-pill px-2 py-1" style="background: rgba(245,158,11,0.12); color: #fbbf24; font-size: 0.72rem; font-weight: 600;">
-                        <i class="bi bi-lightning me-1"></i>Live
+                    <span class="badge badge-neon-amber px-2.5 py-1 rounded-pill small fw-semibold">
+                        <i class="bi bi-stars"></i>Available
                     </span>
                 </div>
                 <div class="mt-2">
-                    <div class="fw-bold mb-1" style="font-size: 2rem; line-height: 1; color: #f8fafc;">@activePlans</div>
-                    <div class="text-muted" style="font-size: 0.85rem;">Active Gym Plans</div>
+                    <div class="fw-extrabold text-white mb-1" style="font-size: 2.25rem; line-height: 1;">@activePlans</div>
+                    <div class="text-muted small fw-medium">Active Membership Plans</div>
                 </div>
-                <div class="mt-3 pt-3 border-top border-secondary border-opacity-10">
-                    <small class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-star me-1 text-warning"></i>Subscription plans offered</small>
+                <div class="mt-3 pt-3 border-top border-white border-opacity-10 d-flex align-items-center justify-content-between text-muted small">
+                    <span><i class="bi bi-tag-fill text-amber me-1"></i>Subscription Tiers</span>
+                    <a href="subscriptions" class="text-amber text-decoration-none font-monospace fs-7">Plans →</a>
                 </div>
             </div>
         </div>
 
+        <!-- Today's Progress Logs -->
         <div class="col-6 col-xl-3">
-            <div class="stat-card h-100">
+            <div class="stat-card stat-card-violet h-100">
                 <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div class="stat-icon-wrapper stat-icon-purple">
+                    <div class="stat-icon-box icon-box-violet">
                         <i class="bi bi-graph-up-arrow"></i>
                     </div>
-                    <span class="badge rounded-pill px-2 py-1" style="background: rgba(139,92,246,0.12); color: #a78bfa; font-size: 0.72rem; font-weight: 600;">
-                        <i class="bi bi-calendar-day me-1"></i>Today
+                    <span class="badge badge-neon-violet px-2.5 py-1 rounded-pill small fw-semibold" style="background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3);">
+                        <i class="bi bi-activity"></i>Metrics
                     </span>
                 </div>
                 <div class="mt-2">
-                    <div class="fw-bold mb-1" style="font-size: 2rem; line-height: 1; color: #f8fafc;">@todaysLogs</div>
-                    <div class="text-muted" style="font-size: 0.85rem;">Progress Logs Today</div>
+                    <div class="fw-extrabold text-white mb-1" style="font-size: 2.25rem; line-height: 1;">@todaysLogs</div>
+                    <div class="text-muted small fw-medium">Progress Logs Today</div>
                 </div>
-                <div class="mt-3 pt-3 border-top border-secondary border-opacity-10">
-                    <small class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-activity me-1" style="color: #8b5cf6;"></i>Body metrics logged today</small>
+                <div class="mt-3 pt-3 border-top border-white border-opacity-10 d-flex align-items-center justify-content-between text-muted small">
+                    <span><i class="bi bi-heart-pulse-fill text-violet me-1"></i>Body Tracking</span>
+                    <a href="progress-logs" class="text-violet text-decoration-none font-monospace fs-7">Metrics →</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Quick Actions -->
+    <!-- Quick Actions Hub -->
     <div class="gym-card p-4 mb-4">
-        <h6 class="fw-bold text-uppercase mb-3" style="font-size: 0.75rem; letter-spacing: 1px; color: #64748b;">
-            <i class="bi bi-zap-fill me-2 text-warning"></i>Quick Actions
-        </h6>
-        <div class="d-flex flex-wrap gap-3">
-            <a href="/members" class="btn btn-gym-primary d-flex align-items-center gap-2">
-                <i class="bi bi-person-plus-fill"></i>
-                <span>New Member</span>
-            </a>
-            <a href="/subscriptions" class="btn btn-gym-success d-flex align-items-center gap-2">
-                <i class="bi bi-cash-coin"></i>
-                <span>Record Payment</span>
-            </a>
-            <a href="/progress-logs" class="btn btn-gym-purple d-flex align-items-center gap-2">
-                <i class="bi bi-clipboard2-pulse-fill"></i>
-                <span>Add Progress Log</span>
-            </a>
-            <a href="/workouts" class="btn btn-gym-outline d-flex align-items-center gap-2">
-                <i class="bi bi-capslock-fill"></i>
-                <span>Create Workout Plan</span>
-            </a>
-            <a href="/nutrition" class="btn btn-gym-outline d-flex align-items-center gap-2">
-                <i class="bi bi-heart-pulse-fill"></i>
-                <span>Manage Diet Plan</span>
-            </a>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="fw-bold text-uppercase text-muted font-monospace mb-0 fs-7" style="letter-spacing: 1.5px;">
+                <i class="bi bi-grid-fill text-info me-2"></i>Quick Actions Hub
+            </h6>
+            <span class="badge bg-dark border border-secondary border-opacity-10 text-muted px-2.5 py-1 rounded-pill small">Shortcuts</span>
+        </div>
+        <div class="row g-3">
+            <div class="col-6 col-sm-4 col-md-2.4 col-lg-2">
+                <a href="members" class="quick-action-card h-100 text-decoration-none">
+                    <div class="avatar bg-info bg-opacity-20 text-info rounded-3 p-2">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small">New Member</div>
+                        <div class="text-muted fs-8">Add Client</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-2.4 col-lg-2">
+                <a href="subscriptions" class="quick-action-card h-100 text-decoration-none">
+                    <div class="avatar bg-success bg-opacity-20 text-success rounded-3 p-2">
+                        <i class="bi bi-credit-card-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small">New Payment</div>
+                        <div class="text-muted fs-8">Record Revenue</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-2.4 col-lg-2">
+                <a href="progress-logs" class="quick-action-card h-100 text-decoration-none">
+                    <div class="avatar bg-violet bg-opacity-20 text-violet rounded-3 p-2" style="background: rgba(139,92,246,0.2); color: #a78bfa;">
+                        <i class="bi bi-activity"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small">Add Metric</div>
+                        <div class="text-muted fs-8">Body Progress</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-2.4 col-lg-2">
+                <a href="workouts" class="quick-action-card h-100 text-decoration-none">
+                    <div class="avatar bg-warning bg-opacity-20 text-warning rounded-3 p-2">
+                        <i class="bi bi-lightning-fill"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small">Workout Plan</div>
+                        <div class="text-muted fs-8">Routine Builder</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-2.4 col-lg-2">
+                <a href="nutrition" class="quick-action-card h-100 text-decoration-none">
+                    <div class="avatar bg-rose bg-opacity-20 text-rose rounded-3 p-2" style="background: rgba(244,63,94,0.2); color: #fb7185;">
+                        <i class="bi bi-egg-fried"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small">Diet Plan</div>
+                        <div class="text-muted fs-8">Nutrition Specs</div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-6 col-sm-4 col-md-2.4 col-lg-2">
+                <a href="users" class="quick-action-card h-100 text-decoration-none">
+                    <div class="avatar bg-primary bg-opacity-20 text-primary rounded-3 p-2">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-white small">User Control</div>
+                        <div class="text-muted fs-8">Roles & Access</div>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Lower Section: Recent Payments + Active Subscriptions -->
-    <div class="row g-4">
-        <!-- Recent Payments -->
+    <!-- Main Content Section: Payments & Subscriptions Grid -->
+    <div class="row g-4 mb-4">
+        <!-- Recent Payments Table Card -->
         <div class="col-lg-7">
             <div class="gym-card p-4 h-100">
                 <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h5 class="fw-bold mb-0" style="color: #f8fafc;">
-                        <i class="bi bi-receipt me-2 text-success"></i>Recent Payments
-                    </h5>
-                    <a href="/subscriptions" class="text-primary" style="font-size: 0.85rem; font-weight: 500;">
-                        View all <i class="bi bi-arrow-right ms-1"></i>
+                    <div>
+                        <h5 class="fw-bold text-white mb-0">
+                            <i class="bi bi-receipt-cutoff text-success me-2"></i>Recent Payments
+                        </h5>
+                        <p class="text-muted small mb-0">Latest completed member payments</p>
+                    </div>
+                    <a href="subscriptions" class="btn btn-outline-light btn-sm rounded-pill px-3 fs-7 fw-semibold">
+                        View All <i class="bi bi-arrow-right ms-1"></i>
                     </a>
                 </div>
+
                 <div class="table-responsive">
                     <table class="table table-dark-custom mb-0">
                         <thead>
@@ -172,9 +256,9 @@ else
                             @if (!recentPayments.Any())
                             {
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted py-4">
-                                        <i class="bi bi-inbox fs-2 d-block mb-2 opacity-25"></i>
-                                        No payment records yet
+                                    <td colspan="4" class="text-center text-muted py-5">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2 text-white-50 opacity-25"></i>
+                                        No recent payment records found
                                     </td>
                                 </tr>
                             }
@@ -182,24 +266,27 @@ else
                             {
                                 <tr>
                                     <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="rounded-circle bg-primary bg-opacity-20 d-flex align-items-center justify-content-center text-primary fw-bold"
-                                                 style="width: 32px; height: 32px; font-size: 0.75rem; flex-shrink: 0;">
-                                                @(payment.UserName.Length > 0 ? payment.UserName[0].ToString().ToUpper() : "?")
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="avatar bg-primary bg-opacity-20 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.8rem;">
+                                                @GetInitials(payment.UserName)
                                             </div>
-                                            <span class="fw-semibold" style="font-size: 0.875rem;">@payment.UserName</span>
+                                            <div>
+                                                <div class="fw-semibold text-white">@payment.UserName</div>
+                                                <div class="text-muted fs-8">Ref: @payment.PaymentId.ToString()[..8].ToUpper()</div>
+                                            </div>
                                         </div>
                                     </td>
-                                    <td class="text-success fw-bold">$@payment.Amount</td>
                                     <td>
-                                        <span class="badge px-2 py-1 rounded-pill" style="background: rgba(100,116,139,0.2); color: #94a3b8; font-size: 0.75rem;">
+                                        <span class="fw-bold text-emerald font-monospace" style="color: #34d399;">$@payment.Amount.ToString("N2")</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-dark border border-secondary border-opacity-20 text-muted px-2.5 py-1 rounded-pill small">
                                             @payment.PaymentMethod
                                         </span>
                                     </td>
                                     <td>
-                                        <span class="badge rounded-pill px-2 py-1"
-                                              style="background: rgba(16,185,129,0.12); color: #34d399; font-size: 0.75rem;">
-                                            @payment.Status
+                                        <span class="badge badge-neon-emerald px-2.5 py-1 rounded-pill small">
+                                            <i class="bi bi-check-circle-fill me-1"></i>@payment.Status
                                         </span>
                                     </td>
                                 </tr>
@@ -210,74 +297,84 @@ else
             </div>
         </div>
 
-        <!-- Active Subscriptions List -->
+        <!-- Active Subscriptions Progress Card -->
         <div class="col-lg-5">
             <div class="gym-card p-4 h-100">
                 <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h5 class="fw-bold mb-0" style="color: #f8fafc;">
-                        <i class="bi bi-people me-2 text-primary"></i>Active Subscriptions
-                    </h5>
-                    <a href="/subscriptions" class="text-primary" style="font-size: 0.85rem; font-weight: 500;">
-                        View all <i class="bi bi-arrow-right ms-1"></i>
+                    <div>
+                        <h5 class="fw-bold text-white mb-0">
+                            <i class="bi bi-credit-card-2-front-fill text-info me-2"></i>Active Memberships
+                        </h5>
+                        <p class="text-muted small mb-0">Current active member subscriptions</p>
+                    </div>
+                    <a href="subscriptions" class="btn btn-outline-light btn-sm rounded-pill px-3 fs-7 fw-semibold">
+                        View All <i class="bi bi-arrow-right ms-1"></i>
                     </a>
                 </div>
 
                 @if (!activeSubscriptions.Any())
                 {
-                    <div class="text-center text-muted py-4">
-                        <i class="bi bi-person-x fs-2 d-block mb-2 opacity-25"></i>
-                        <p style="font-size: 0.875rem;">No active subscriptions yet</p>
+                    <div class="text-center text-muted py-5">
+                        <i class="bi bi-card-heading fs-1 d-block mb-2 text-white-50 opacity-25"></i>
+                        <p class="small mb-0">No active subscriptions currently running</p>
                     </div>
                 }
-                <div class="d-flex flex-column gap-2">
-                    @foreach (var sub in activeSubscriptions)
-                    {
-                        var daysLeft = (int)(sub.EndDate - DateTime.UtcNow).TotalDays;
-                        var progressPct = Math.Clamp((int)(100.0 - daysLeft * 100.0 / Math.Max((sub.EndDate - sub.StartDate).TotalDays, 1)), 0, 100);
-                        var barColor = daysLeft > 14 ? "#10b981" : daysLeft > 7 ? "#f59e0b" : "#ef4444";
-                        <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <div class="d-flex align-items-center gap-2">
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold"
-                                         style="width: 30px; height: 30px; background: linear-gradient(135deg, #3b82f6, #2563eb); font-size: 0.7rem; color: white; flex-shrink: 0;">
-                                        @(sub.UserName.Length > 0 ? sub.UserName[0].ToString().ToUpper() : "?")
+                else
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var sub in activeSubscriptions)
+                        {
+                            var daysLeft = (int)(sub.EndDate - DateTime.UtcNow).TotalDays;
+                            var totalDays = Math.Max((sub.EndDate - sub.StartDate).TotalDays, 1);
+                            var progressPct = Math.Clamp((int)(100.0 - daysLeft * 100.0 / totalDays), 0, 100);
+                            var barColorClass = daysLeft > 14 ? "bg-emerald" : daysLeft > 7 ? "bg-warning" : "bg-danger";
+                            var textColorStyle = daysLeft > 14 ? "#34d399" : daysLeft > 7 ? "#fbbf24" : "#fb7185";
+
+                            <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-10">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar bg-info bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 34px; height: 34px; font-size: 0.75rem;">
+                                            @GetInitials(sub.UserName)
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold text-white small">@sub.UserName</div>
+                                            <div class="text-muted fs-8">@sub.PlanName</div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div class="fw-semibold" style="font-size: 0.85rem; color: #f1f5f9;">@sub.UserName</div>
-                                        <div class="text-muted" style="font-size: 0.72rem;">@sub.PlanName</div>
+                                    <div class="text-end">
+                                        <div class="fw-bold font-monospace small" style="color: @textColorStyle;">@daysLeft days left</div>
+                                        <div class="text-muted fs-8">$@sub.Price / plan</div>
                                     </div>
                                 </div>
-                                <div class="text-end">
-                                    <div class="fw-bold" style="font-size: 0.8rem; color: @barColor;">@daysLeft d left</div>
-                                    <div class="text-muted" style="font-size: 0.72rem;">$@sub.Price/plan</div>
+                                <div class="progress bg-dark" style="height: 5px; border-radius: 3px;">
+                                    <div class="progress-bar @barColorClass" style="width: @progressPct%; border-radius: 3px;"></div>
                                 </div>
                             </div>
-                            <div class="progress" style="height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px;">
-                                <div class="progress-bar" style="width: @progressPct%; background: @barColor; border-radius: 2px;"></div>
-                            </div>
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
+                }
             </div>
         </div>
     </div>
 
-    <!-- Bottom: Available Plans Overview -->
-    <div class="gym-card p-4 mt-4">
+    <!-- Available Plans Showcase Row -->
+    <div class="gym-card p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
-            <h5 class="fw-bold mb-0" style="color: #f8fafc;">
-                <i class="bi bi-stars me-2 text-warning"></i>Available Subscription Plans
-            </h5>
-            <a href="/subscriptions" class="btn btn-gym-outline btn-sm">
-                <i class="bi bi-plus-circle me-1"></i>Manage Plans
+            <div>
+                <h5 class="fw-bold text-white mb-0">
+                    <i class="bi bi-stars text-warning me-2"></i>Membership Tier Options
+                </h5>
+                <p class="text-muted small mb-0">Offered gym subscription packages</p>
+            </div>
+            <a href="subscriptions" class="btn btn-outline-info btn-sm rounded-3 px-3 fw-semibold">
+                <i class="bi bi-gear-fill me-1"></i>Manage Tiers
             </a>
         </div>
 
         @if (!plans.Any())
         {
             <div class="text-center text-muted py-4">
-                <i class="bi bi-tags fs-2 d-block mb-2 opacity-25"></i>
-                <p style="font-size: 0.875rem;">No plans created yet. <a href="/subscriptions" class="text-primary">Create your first plan →</a></p>
+                <p class="small mb-0">No subscription plans defined. <a href="subscriptions" class="text-info">Create plans →</a></p>
             </div>
         }
         else
@@ -285,26 +382,21 @@ else
             <div class="row g-3">
                 @foreach (var plan in plans)
                 {
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="p-3 rounded-3 h-100 d-flex flex-column" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); transition: all 0.2s;">
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="p-3.5 rounded-4 h-100 d-flex flex-column bg-dark bg-opacity-40 border border-secondary border-opacity-10 hover-bg-light transition">
                             <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="badge rounded-pill px-2 py-1" style="background: rgba(59,130,246,0.12); color: #60a5fa; font-size: 0.7rem;">@plan.BillingCycle</span>
-                                @if (plan.IsActive)
-                                {
-                                    <span class="badge rounded-pill px-2 py-1" style="background: rgba(16,185,129,0.12); color: #34d399; font-size: 0.7rem;">Active</span>
-                                }
-                                else
-                                {
-                                    <span class="badge rounded-pill px-2 py-1" style="background: rgba(100,116,139,0.15); color: #64748b; font-size: 0.7rem;">Inactive</span>
-                                }
+                                <span class="badge badge-neon-cyan px-2.5 py-1 rounded-pill small">@plan.BillingCycle</span>
+                                <span class="badge badge-neon-emerald px-2.5 py-1 rounded-pill small">@plan.DurationDays Days</span>
                             </div>
-                            <h6 class="fw-bold mb-1 text-white">@plan.Name</h6>
-                            <p class="text-muted mb-2" style="font-size: 0.78rem; flex-grow: 1;">@(plan.Description ?? "No description")</p>
-                            <div class="d-flex align-items-end justify-content-between mt-2 pt-2 border-top border-secondary border-opacity-10">
+                            <h6 class="fw-bold text-white fs-6 mb-1">@plan.Name</h6>
+                            <p class="text-muted small mb-3 flex-grow-1" style="font-size: 0.82rem;">@(plan.Description ?? "Full facility access package")</p>
+                            
+                            <div class="d-flex align-items-end justify-content-between pt-2 border-top border-white border-opacity-10">
                                 <div>
-                                    <span class="fw-bold text-success" style="font-size: 1.25rem;">$@plan.Price</span>
+                                    <span class="text-muted fs-8 d-block">Price</span>
+                                    <span class="fw-extrabold text-info fs-4 font-monospace">$@plan.Price</span>
                                 </div>
-                                <span class="text-muted" style="font-size: 0.75rem;">@plan.DurationDays days</span>
+                                <a href="subscriptions" class="btn btn-sm btn-primary rounded-3 px-3 fw-semibold">Details</a>
                             </div>
                         </div>
                     </div>
@@ -316,6 +408,7 @@ else
 
 @code {
     private bool isLoading = true;
+    private string? userName;
 
     private int totalMembers;
     private decimal monthlyRevenue;
@@ -330,16 +423,22 @@ else
     {
         try
         {
-            // Fetch members (all users with Member role)
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                userName = authState.User.Identity.Name;
+            }
+
+            // Fetch members
             var members = await UserService.GetUsersByRoleAsync(UserRole.Member);
             totalMembers = members.Count;
 
-            // Subscription plans
+            // Fetch subscription plans
             var allPlans = await SubscriptionService.GetAllPlansAsync(activeOnly: false);
             plans = allPlans.ToList();
             activePlans = allPlans.Count(p => p.IsActive);
 
-            // All subscriptions — filter active ones
+            // Fetch active subscriptions
             var subs = await SubscriptionService.GetAllSubscriptionsAsync();
             activeSubscriptions = subs
                 .Where(s => s.Status == Domain.Enums.SubscriptionStatus.Active)
@@ -347,11 +446,11 @@ else
                 .Take(5)
                 .ToList();
 
-            // Payments
+            // Fetch payments
             var payments = await PaymentService.GetAllPaymentsAsync();
             recentPayments = payments.Take(5).ToList();
 
-            // Monthly revenue — sum of completed payments this month
+            // Calculate monthly revenue
             var now = DateTime.UtcNow;
             monthlyRevenue = payments
                 .Where(p => p.Status == Domain.Enums.PaymentStatus.Completed
@@ -359,13 +458,22 @@ else
                          && p.PaymentDate.Month == now.Month)
                 .Sum(p => p.Amount);
 
-            // Today's progress logs (approximate via count — logged today UTC)
-            todaysLogs = 0; // placeholder: progress logs service has no GetAllAsync; shown as 0 until populated
+            todaysLogs = 0;
         }
-        catch { /* swallow gracefully — partial data is fine on dashboard */ }
+        catch
+        {
+        }
         finally
         {
             isLoading = false;
         }
+    }
+
+    private static string GetInitials(string? fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName)) return "U";
+        var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0][..1].ToUpper();
+        return (parts[0][..1] + parts[^1][..1]).ToUpper();
     }
 }

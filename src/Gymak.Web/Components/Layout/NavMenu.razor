@@ -1,90 +1,126 @@
 <div class="sidebar-container d-flex flex-column h-100">
     <!-- Brand Header -->
-    <div class="brand-header px-4 py-3 border-bottom border-secondary border-opacity-10 d-flex align-items-center justify-content-between">
-        <a class="d-flex align-items-center text-decoration-none" href="">
-            <div class="brand-icon me-3">
+    <div class="brand-header px-4 py-3 d-flex align-items-center justify-content-between"
+         style="border-bottom: 1px solid rgba(255,255,255,0.06); min-height: 64px;">
+        <a class="d-flex align-items-center gap-3 text-decoration-none" href="">
+            <div class="brand-icon">
                 <i class="bi bi-lightning-charge-fill"></i>
             </div>
             <div>
-                <span class="brand-title fw-bold fs-5 text-white d-block">GYMAK</span>
-                <span class="brand-subtitle text-primary text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 1.5px;">Fitness OS</span>
+                <span class="fw-extrabold fs-5 text-white d-block" style="letter-spacing: -0.5px;">GYMAK</span>
+                <span class="fw-semibold text-uppercase" style="font-size: 0.6rem; letter-spacing: 2px; background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Fitness OS</span>
             </div>
         </a>
-        <button class="navbar-toggler d-md-none text-white border-0 bg-transparent" type="button" @onclick="ToggleNavMenu">
-            <i class="bi bi-list fs-3"></i>
+        <button class="d-md-none text-white border-0 bg-transparent p-1 rounded-2" type="button" @onclick="ToggleNavMenu"
+                style="background: rgba(255,255,255,0.05) !important;">
+            <i class="bi bi-list fs-4"></i>
         </button>
     </div>
 
     <!-- Navigation List -->
-    <div class="nav-scrollable flex-grow-1 px-3 py-4 @(collapseNavMenu ? "collapse" : "")">
-        <div class="nav-section-title px-3 mb-2 text-uppercase text-muted font-monospace" style="font-size: 0.7rem; letter-spacing: 1px;">
-            Main Navigation
+    <div class="nav-scrollable flex-grow-1 px-3 py-3 @(collapseNavMenu ? "collapse" : "")">
+
+        <div class="nav-section-title px-3 mb-2 text-uppercase font-monospace" style="font-size: 0.62rem; letter-spacing: 2px; color: #2d3f5a;">
+            ⬡ Main Menu
         </div>
 
         <nav class="nav flex-column gap-1">
             <div class="nav-item">
-                <NavLink class="nav-link-custom d-flex align-items-center" href="" Match="NavLinkMatch.All">
-                    <i class="bi bi-grid-1x2-fill nav-icon me-3"></i>
+                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="" Match="NavLinkMatch.All">
+                    <i class="bi bi-grid-1x2-fill nav-icon" style="font-size: 1.1rem;"></i>
                     <span>Dashboard</span>
                 </NavLink>
             </div>
 
             <div class="nav-item">
-                <NavLink class="nav-link-custom d-flex align-items-center" href="members">
-                    <i class="bi bi-people-fill nav-icon me-3"></i>
+                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="members">
+                    <i class="bi bi-people-fill nav-icon" style="font-size: 1.1rem;"></i>
                     <span>Users & Members</span>
                 </NavLink>
             </div>
 
             <div class="nav-item">
-                <NavLink class="nav-link-custom d-flex align-items-center" href="workouts">
-                    <i class="bi bi-capslock-fill nav-icon me-3"></i>
-                    <span>Workouts & Exercises</span>
+                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="workouts">
+                    <i class="bi bi-lightning-fill nav-icon" style="font-size: 1.1rem;"></i>
+                    <span>Workouts</span>
                 </NavLink>
             </div>
 
             <div class="nav-item">
-                <NavLink class="nav-link-custom d-flex align-items-center" href="nutrition">
-                    <i class="bi bi-heart-pulse-fill nav-icon me-3"></i>
+                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="nutrition">
+                    <i class="bi bi-egg-fried nav-icon" style="font-size: 1.1rem;"></i>
                     <span>Diet & Nutrition</span>
                 </NavLink>
             </div>
 
             <div class="nav-item">
-                <NavLink class="nav-link-custom d-flex align-items-center" href="subscriptions">
-                    <i class="bi bi-credit-card-2-front-fill nav-icon me-3"></i>
+                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="subscriptions">
+                    <i class="bi bi-credit-card-fill nav-icon" style="font-size: 1.1rem;"></i>
                     <span>Subscriptions</span>
                 </NavLink>
             </div>
 
             <div class="nav-item">
-                <NavLink class="nav-link-custom d-flex align-items-center" href="progress-logs">
-                    <i class="bi bi-graph-up-arrow nav-icon me-3"></i>
+                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="progress-logs">
+                    <i class="bi bi-graph-up-arrow nav-icon" style="font-size: 1.1rem;"></i>
                     <span>Progress & Metrics</span>
+                </NavLink>
+            </div>
+        </nav>
+
+        <!-- Divider -->
+        <div class="my-3" style="border-top: 1px solid rgba(255,255,255,0.04);"></div>
+
+        <div class="nav-section-title px-3 mb-2 text-uppercase font-monospace" style="font-size: 0.62rem; letter-spacing: 2px; color: #2d3f5a;">
+            ⬡ System
+        </div>
+
+        <nav class="nav flex-column gap-1">
+            <div class="nav-item">
+                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="users">
+                    <i class="bi bi-shield-check nav-icon" style="font-size: 1.1rem;"></i>
+                    <span>User Management</span>
+                </NavLink>
+            </div>
+
+            <div class="nav-item">
+                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="profile">
+                    <i class="bi bi-person-badge-fill nav-icon" style="font-size: 1.1rem;"></i>
+                    <span>My Profile</span>
                 </NavLink>
             </div>
         </nav>
     </div>
 
-    <!-- Footer Profile Info -->
-    <div class="sidebar-footer p-3 border-top border-secondary border-opacity-10">
+    <!-- Footer Profile -->
+    <div class="p-3" style="border-top: 1px solid rgba(255,255,255,0.05);">
         <AuthorizeView>
             <Authorized>
-                <a href="profile" class="d-flex align-items-center p-2 rounded-3 bg-dark bg-opacity-50 text-decoration-none text-white hover-bg-light transition">
-                    <div class="avatar me-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 38px; height: 38px;">
+                <a href="profile" class="d-flex align-items-center gap-2 p-2 rounded-3 text-decoration-none"
+                   style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.15); transition: all 0.2s ease;">
+                    <div class="d-flex align-items-center justify-content-center fw-bold text-white rounded-circle flex-shrink-0"
+                         style="width: 38px; height: 38px; background: linear-gradient(135deg, #0ea5e9, #3b82f6); font-size: 0.8rem; box-shadow: 0 0 12px rgba(14,165,233,0.35);">
                         @GetInitials(context.User.Identity?.Name)
                     </div>
                     <div class="overflow-hidden me-auto">
-                        <span class="d-block text-white fw-semibold text-truncate" style="font-size: 0.85rem;">@(context.User.Identity?.Name ?? "User Profile")</span>
-                        <span class="d-block text-success small" style="font-size: 0.75rem;"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i>Authenticated</span>
+                        <span class="d-block text-white fw-semibold text-truncate" style="font-size: 0.83rem;">@(context.User.Identity?.Name ?? "My Account")</span>
+                        <span class="d-block small" style="font-size: 0.7rem; color: #34d399;">
+                            <i class="bi bi-circle-fill me-1" style="font-size: 0.45rem;"></i>Online & Authenticated
+                        </span>
                     </div>
-                    <i class="bi bi-gear-fill text-muted ms-2"></i>
+                    <i class="bi bi-box-arrow-right text-muted" style="font-size: 0.9rem;"></i>
                 </a>
             </Authorized>
             <NotAuthorized>
                 <div class="d-flex flex-column gap-2">
-                    <a href="login" class="btn btn-outline-primary btn-sm w-100 fw-semibold">Sign In</a>
-                    <a href="register" class="btn btn-primary btn-sm w-100 fw-semibold">Register</a>
+                    <a href="login" class="btn btn-sm fw-semibold rounded-3 w-100"
+                       style="background: rgba(14,165,233,0.12); border: 1px solid rgba(14,165,233,0.3); color: #38bdf8;">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
+                    </a>
+                    <a href="register" class="btn btn-sm fw-semibold rounded-3 w-100"
+                       style="background: linear-gradient(135deg, #0ea5e9, #3b82f6); color: white; border: none;">
+                        <i class="bi bi-person-plus me-1"></i>Create Account
+                    </a>
                 </div>
             </NotAuthorized>
         </AuthorizeView>
