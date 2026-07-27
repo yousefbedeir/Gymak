@@ -24,9 +24,25 @@
                     <span class="text-white fw-semibold">SQL Server Connected</span>
                 </div>
 
-                <div class="header-icon-btn rounded-circle d-flex align-items-center justify-content-center text-muted cursor-pointer" style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.05);">
-                    <i class="bi bi-bell-fill fs-5"></i>
-                </div>
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="profile" class="btn btn-dark bg-opacity-50 border border-secondary border-opacity-10 text-white rounded-pill px-3 py-1.5 btn-sm d-flex align-items-center gap-2 text-decoration-none">
+                                <i class="bi bi-person-circle text-primary"></i>
+                                <span class="fw-semibold" style="font-size: 0.85rem;">@context.User.Identity?.Name</span>
+                            </a>
+                            <button class="btn btn-outline-danger border-opacity-20 rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" title="Sign Out" @onclick="HandleLogout">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </button>
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="login" class="btn btn-outline-primary btn-sm rounded-pill px-3">Sign In</a>
+                            <a href="register" class="btn btn-primary btn-sm rounded-pill px-3">Register</a>
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
             </div>
         </header>
 
@@ -48,3 +64,19 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@using Gymak.Web.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+@code {
+    private async Task HandleLogout()
+    {
+        if (AuthStateProvider is CustomAuthenticationStateProvider customAuthStateProvider)
+        {
+            await customAuthStateProvider.MarkUserAsLoggedOut();
+        }
+        NavigationManager.NavigateTo("login");
+    }
+}

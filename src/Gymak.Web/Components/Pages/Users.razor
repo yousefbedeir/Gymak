@@ -1,0 +1,300 @@
+@page "/users"
+@using Gymak.Application.DTOs
+@using Gymak.Application.Services
+@using Gymak.Domain.Enums
+@using Microsoft.AspNetCore.Authorization
+@inject IUserService UserService
+@inject IAuthService AuthService
+
+<PageTitle>User & Member Management - Gymak Fitness OS</PageTitle>
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+        <div>
+            <h3 class="fw-bold text-white mb-1">User & Member Management</h3>
+            <p class="text-muted small mb-0">Manage system users, trainers, members, and access privileges</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-primary rounded-3 px-3 py-2 btn-sm fw-semibold d-flex align-items-center gap-2" @onclick="OpenCreateUserModal">
+                <i class="bi bi-person-plus-fill"></i> Add New User
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters & Search Bar -->
+    <div class="card border-0 rounded-4 text-white mb-4" style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08) !important;">
+        <div class="card-body p-3 p-md-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text border-0 bg-dark text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control bg-dark border-0 text-white shadow-none" placeholder="Search by name or email..." @bind="searchTerm" @bind:event="oninput" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select bg-dark border-0 text-white" @bind="selectedRoleFilter">
+                        <option value="All">All Roles</option>
+                        <option value="Admin">Admins</option>
+                        <option value="Trainer">Trainers</option>
+                        <option value="Member">Members</option>
+                    </select>
+                </div>
+                <div class="col-md-3 text-end">
+                    <span class="text-muted small">Total Found: </span>
+                    <span class="badge bg-primary rounded-pill px-3 py-1">@FilteredUsers.Count</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card border-0 rounded-4 text-white overflow-hidden" style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08) !important;">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0" style="--bs-table-bg: transparent;">
+                <thead class="text-muted font-monospace small text-uppercase" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                    <tr>
+                        <th class="ps-4 py-3">User</th>
+                        <th class="py-3">Role</th>
+                        <th class="py-3">Phone</th>
+                        <th class="py-3">Joined Date</th>
+                        <th class="pe-4 text-end py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading)
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <div class="spinner-border spinner-border-sm me-2 text-primary" role="status"></div>
+                                Loading users...
+                            </td>
+                        </tr>
+                    }
+                    else if (!FilteredUsers.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-people fs-2 d-block mb-2"></i>
+                                No matching users found.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var user in FilteredUsers)
+                        {
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="avatar bg-primary bg-opacity-20 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px;">
+                                            @GetInitials(user.FullName)
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold text-white">@user.FullName</div>
+                                            <div class="text-muted small">@user.Email</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge @GetRoleBadgeClass(user.Role) px-3 py-1 rounded-pill">
+                                        @user.Role
+                                    </span>
+                                </td>
+                                <td class="text-muted small">
+                                    @(user.PhoneNumber ?? "—")
+                                </td>
+                                <td class="text-muted small">
+                                    @user.CreatedAt.ToString("MMM dd, yyyy")
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <button class="btn btn-sm btn-outline-light rounded-2 me-1" title="View Profile" @onclick="() => ViewUserProfile(user.UserId)">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Create New User -->
+@if (showCreateModal)
+{
+    <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 text-white" style="background: #1e293b; border: 1px solid rgba(255,255,255,0.1) !important;">
+                <div class="modal-header border-bottom border-secondary border-opacity-10 p-4">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-person-plus-fill text-primary me-2"></i>Create User Account</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseCreateUserModal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    @if (createErrorMessage != null)
+                    {
+                        <div class="alert alert-danger py-2 px-3 rounded-3 small mb-3">@createErrorMessage</div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="form-label text-white-50 small">Full Name</label>
+                        <input type="text" class="form-control bg-dark border-0 text-white" @bind="newUserModel.FullName" placeholder="e.g. Captain Samir" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white-50 small">Email Address</label>
+                        <input type="email" class="form-control bg-dark border-0 text-white" @bind="newUserModel.Email" placeholder="samir@gymak.com" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white-50 small">Role</label>
+                        <select class="form-select bg-dark border-0 text-white" @bind="newUserModel.Role">
+                            <option value="@UserRole.Member">Member</option>
+                            <option value="@UserRole.Trainer">Trainer</option>
+                            <option value="@UserRole.Admin">Admin</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white-50 small">Initial Password</label>
+                        <input type="password" class="form-control bg-dark border-0 text-white" @bind="newUserModel.Password" placeholder="••••••••" required />
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary border-opacity-10 p-3">
+                    <button type="button" class="btn btn-outline-secondary rounded-3" @onclick="CloseCreateUserModal">Cancel</button>
+                    <button type="button" class="btn btn-primary rounded-3 fw-semibold" @onclick="HandleCreateUser" disabled="@isCreatingUser">
+                        @if (isCreatingUser)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                            <span>Creating...</span>
+                        }
+                        else
+                        {
+                            <span>Create Account</span>
+                        }
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<UserDto> usersList = new();
+    private bool isLoading = true;
+    private string searchTerm = string.Empty;
+    private string selectedRoleFilter = "All";
+
+    private bool showCreateModal;
+    private bool isCreatingUser;
+    private string? createErrorMessage;
+
+    private CreateUserModel newUserModel = new();
+
+    private class CreateUserModel
+    {
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public UserRole Role { get; set; } = UserRole.Member;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        isLoading = true;
+        try
+        {
+            var admins = await UserService.GetUsersByRoleAsync(UserRole.Admin);
+            var trainers = await UserService.GetUsersByRoleAsync(UserRole.Trainer);
+            var members = await UserService.GetUsersByRoleAsync(UserRole.Member);
+
+            usersList = admins.Concat(trainers).Concat(members).OrderByDescending(u => u.CreatedAt).ToList();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private List<UserDto> FilteredUsers => usersList.Where(u =>
+        (selectedRoleFilter == "All" || u.Role.ToString() == selectedRoleFilter) &&
+        (string.IsNullOrWhiteSpace(searchTerm) ||
+         u.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+         u.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+    ).ToList();
+
+    private void OpenCreateUserModal()
+    {
+        newUserModel = new CreateUserModel();
+        createErrorMessage = null;
+        showCreateModal = true;
+    }
+
+    private void CloseCreateUserModal()
+    {
+        showCreateModal = false;
+    }
+
+    private async Task HandleCreateUser()
+    {
+        if (string.IsNullOrWhiteSpace(newUserModel.FullName) || string.IsNullOrWhiteSpace(newUserModel.Email) || string.IsNullOrWhiteSpace(newUserModel.Password))
+        {
+            createErrorMessage = "Please fill in all required fields.";
+            return;
+        }
+
+        isCreatingUser = true;
+        createErrorMessage = null;
+
+        try
+        {
+            var req = new CreateUserRequest(
+                newUserModel.FullName,
+                newUserModel.Email,
+                newUserModel.Password,
+                null,
+                newUserModel.Role
+            );
+
+            await UserService.CreateUserAsync(req);
+            showCreateModal = false;
+            await LoadUsers();
+        }
+        catch (Exception ex)
+        {
+            createErrorMessage = ex.Message;
+        }
+        finally
+        {
+            isCreatingUser = false;
+        }
+    }
+
+    private void ViewUserProfile(Guid userId)
+    {
+        // Navigation or inspect profile
+    }
+
+    private static string GetInitials(string? fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName)) return "U";
+        var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0][..1].ToUpper();
+        return (parts[0][..1] + parts[^1][..1]).ToUpper();
+    }
+
+    private static string GetRoleBadgeClass(UserRole role) => role switch
+    {
+        UserRole.Admin => "bg-danger bg-opacity-20 text-danger border border-danger border-opacity-20",
+        UserRole.Trainer => "bg-warning bg-opacity-20 text-warning border border-warning border-opacity-20",
+        UserRole.Member => "bg-success bg-opacity-20 text-success border border-success border-opacity-20",
+        _ => "bg-secondary bg-opacity-20 text-secondary"
+    };
+}

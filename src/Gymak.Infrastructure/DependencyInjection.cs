@@ -27,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<IMemberRepository, MemberRepository>();
 
         // Module 1: User & Identity
+        services.AddScoped<IPasswordHasher, Identity.PasswordHasher>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IMemberProfileRepository, MemberProfileRepository>();
         services.AddScoped<ITrainerClientRepository, TrainerClientRepository>();

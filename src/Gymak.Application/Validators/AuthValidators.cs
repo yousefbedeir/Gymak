@@ -36,3 +36,52 @@ public class LoginRequestValidator : AbstractValidator<LoginRequest>
             .NotEmpty().WithMessage("Password is required.");
     }
 }
+
+public class ForgotPasswordRequestValidator : AbstractValidator<ForgotPasswordRequest>
+{
+    public ForgotPasswordRequestValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email is required.")
+            .EmailAddress().WithMessage("A valid email address is required.");
+    }
+}
+
+public class ResetPasswordRequestValidator : AbstractValidator<ResetPasswordRequest>
+{
+    public ResetPasswordRequestValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email is required.")
+            .EmailAddress().WithMessage("A valid email address is required.");
+
+        RuleFor(x => x.Token)
+            .NotEmpty().WithMessage("Reset token is required.");
+
+        RuleFor(x => x.NewPassword)
+            .NotEmpty().WithMessage("New password is required.")
+            .MinimumLength(6).WithMessage("Password must be at least 6 characters.");
+
+        RuleFor(x => x.ConfirmNewPassword)
+            .Equal(x => x.NewPassword).WithMessage("Passwords do not match.");
+    }
+}
+
+public class ChangePasswordRequestValidator : AbstractValidator<ChangePasswordRequest>
+{
+    public ChangePasswordRequestValidator()
+    {
+        RuleFor(x => x.UserId)
+            .NotEmpty().WithMessage("User ID is required.");
+
+        RuleFor(x => x.CurrentPassword)
+            .NotEmpty().WithMessage("Current password is required.");
+
+        RuleFor(x => x.NewPassword)
+            .NotEmpty().WithMessage("New password is required.")
+            .MinimumLength(6).WithMessage("Password must be at least 6 characters.");
+
+        RuleFor(x => x.ConfirmNewPassword)
+            .Equal(x => x.NewPassword).WithMessage("Passwords do not match.");
+    }
+}

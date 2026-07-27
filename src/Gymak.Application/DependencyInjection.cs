@@ -10,6 +10,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IMemberService, MemberService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IWorkoutService, WorkoutService>();

@@ -9,6 +9,8 @@ public class User : BaseEntity
     public string PasswordHash { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; }
     public UserRole Role { get; set; } = UserRole.Member;
+    public string? PasswordResetToken { get; set; }
+    public DateTime? ResetTokenExpiresAt { get; set; }
 
     // Navigation Properties
     public MemberProfile? Profile { get; set; }

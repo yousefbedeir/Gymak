@@ -1,0 +1,385 @@
+@page "/profile"
+@using System.Security.Claims
+@using Gymak.Application.DTOs
+@using Gymak.Application.Services
+@using Gymak.Domain.Enums
+@using Gymak.Web.Identity
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IUserService UserService
+@inject IAuthService AuthService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>My Profile - Gymak Fitness OS</PageTitle>
+
+<div class="container-fluid py-4">
+    <!-- Header Banner -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 rounded-4 overflow-hidden position-relative" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(255, 255, 255, 0.08) !important;">
+                <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="avatar-lg bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-1 shadow-lg" style="width: 80px; height: 80px; box-shadow: 0 0 25px rgba(14, 165, 233, 0.3) !important;">
+                            @GetInitials(userDto?.FullName)
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <h3 class="fw-bold text-white mb-0">@(userDto?.FullName ?? "User Profile")</h3>
+                                <span class="badge @GetRoleBadgeClass(userDto?.Role) px-3 py-1 rounded-pill fs-7">
+                                    @(userDto?.Role.ToString() ?? "User")
+                                </span>
+                                @if (userDto?.IsPremium == true)
+                                {
+                                    <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-20 px-3 py-1 rounded-pill fs-7">
+                                        <i class="bi bi-star-fill me-1"></i>PRO VIP
+                                    </span>
+                                }
+                            </div>
+                            <p class="text-muted mb-0 small"><i class="bi bi-envelope me-1"></i>@(userDto?.Email)</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="subscriptions" class="btn btn-outline-primary rounded-3 px-3 py-2 btn-sm d-flex align-items-center gap-2">
+                            <i class="bi bi-credit-card-2-front-fill"></i> Subscription Plans
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs & Content -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 rounded-4 text-white" style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08) !important;">
+                <div class="card-header bg-transparent border-bottom border-secondary border-opacity-10 p-3 p-md-4">
+                    <ul class="nav nav-pills card-header-pills gap-2">
+                        <li class="nav-item">
+                            <button class="nav-link @(activeTab == "details" ? "active bg-primary" : "text-white-50") px-4 py-2 rounded-3 small fw-semibold" @onclick='() => activeTab = "details"'>
+                                <i class="bi bi-person-badge me-2"></i>Personal Details
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link @(activeTab == "security" ? "active bg-primary" : "text-white-50") px-4 py-2 rounded-3 small fw-semibold" @onclick='() => activeTab = "security"'>
+                                <i class="bi bi-shield-lock me-2"></i>Security & Password
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-body p-4">
+                    @if (activeTab == "details")
+                    {
+                        @if (profileSuccessMessage != null)
+                        {
+                            <div class="alert alert-success border-0 bg-success bg-opacity-20 text-success py-2 px-3 rounded-3 small mb-4">
+                                <i class="bi bi-check-circle-fill me-2"></i>@profileSuccessMessage
+                            </div>
+                        }
+
+                        <EditForm Model="profileInput" OnValidSubmit="HandleSaveProfile">
+                            <h6 class="text-uppercase text-muted font-monospace mb-3 fs-7" style="letter-spacing: 1px;">Account Overview</h6>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label text-white-50 small">Full Name</label>
+                                    <input type="text" class="form-control bg-dark border-0 text-white" @bind="profileInput.FullName" readonly />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-white-50 small">Email Address</label>
+                                    <input type="email" class="form-control bg-dark border-0 text-white" @bind="profileInput.Email" readonly />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-white-50 small">Phone Number</label>
+                                    <input type="text" class="form-control bg-dark border-0 text-white" @bind="profileInput.PhoneNumber" placeholder="Add phone number..." />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-white-50 small">Role</label>
+                                    <input type="text" class="form-control bg-dark border-0 text-white" value="@(userDto?.Role.ToString())" readonly />
+                                </div>
+                            </div>
+
+                            @if (memberProfileDto != null || userDto?.Role == UserRole.Member)
+                            {
+                                <hr class="border-secondary border-opacity-10 my-4" />
+                                <h6 class="text-uppercase text-muted font-monospace mb-3 fs-7" style="letter-spacing: 1px;">Fitness Profile & Body Metrics</h6>
+                                
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label text-white-50 small">Height (cm)</label>
+                                        <input type="number" step="0.1" class="form-control bg-dark border-0 text-white" @bind="profileInput.Height" placeholder="175" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-white-50 small">Current Weight (kg)</label>
+                                        <input type="number" step="0.1" class="form-control bg-dark border-0 text-white" @bind="profileInput.CurrentWeight" placeholder="70" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label text-white-50 small">Gender</label>
+                                        <select class="form-select bg-dark border-0 text-white" @bind="profileInput.Gender">
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label text-white-50 small">Fitness Goal</label>
+                                        <input type="text" class="form-control bg-dark border-0 text-white" @bind="profileInput.FitnessGoal" placeholder="e.g. Muscle Gain, Weight Loss, General Fitness" />
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold small" disabled="@isSavingProfile">
+                                    @if (isSavingProfile)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        <span>Saving...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-save me-1"></i>
+                                        <span>Save Profile</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                    else if (activeTab == "security")
+                    {
+                        @if (passwordErrorMessage != null)
+                        {
+                            <div class="alert alert-danger border-0 bg-danger bg-opacity-20 text-danger py-2 px-3 rounded-3 small mb-4">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>@passwordErrorMessage
+                            </div>
+                        }
+
+                        @if (passwordSuccessMessage != null)
+                        {
+                            <div class="alert alert-success border-0 bg-success bg-opacity-20 text-success py-2 px-3 rounded-3 small mb-4">
+                                <i class="bi bi-check-circle-fill me-2"></i>@passwordSuccessMessage
+                            </div>
+                        }
+
+                        <EditForm Model="changePasswordInput" OnValidSubmit="HandleChangePassword">
+                            <h6 class="text-uppercase text-muted font-monospace mb-3 fs-7" style="letter-spacing: 1px;">Change Password</h6>
+                            
+                            <div class="mb-3">
+                                <label class="form-label text-white-50 small">Current Password</label>
+                                <input type="password" class="form-control bg-dark border-0 text-white" @bind="changePasswordInput.CurrentPassword" required placeholder="••••••••" />
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label text-white-50 small">New Password</label>
+                                    <input type="password" class="form-control bg-dark border-0 text-white" @bind="changePasswordInput.NewPassword" required placeholder="••••••••" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-white-50 small">Confirm New Password</label>
+                                    <input type="password" class="form-control bg-dark border-0 text-white" @bind="changePasswordInput.ConfirmNewPassword" required placeholder="••••••••" />
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-warning px-4 py-2 rounded-3 fw-semibold small text-dark" disabled="@isChangingPassword">
+                                    @if (isChangingPassword)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                        <span>Updating Password...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-key-fill me-1"></i>
+                                        <span>Update Password</span>
+                                    }
+                                </button>
+                            </div>
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Info Widget -->
+        <div class="col-lg-4">
+            <div class="card border-0 rounded-4 text-white mb-4" style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08) !important;">
+                <div class="card-body p-4">
+                    <h6 class="text-uppercase text-muted font-monospace mb-3 fs-7" style="letter-spacing: 1px;">Account Status</h6>
+                    
+                    <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-secondary border-opacity-10">
+                        <span class="text-muted small">Status</span>
+                        <span class="badge bg-success bg-opacity-20 text-success">Active Account</span>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-secondary border-opacity-10">
+                        <span class="text-muted small">Role Tier</span>
+                        <span class="text-white fw-semibold small">@(userDto?.Role.ToString())</span>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between py-2">
+                        <span class="text-muted small">Membership</span>
+                        @if (userDto?.IsPremium == true)
+                        {
+                            <span class="text-warning fw-semibold small"><i class="bi bi-check-circle-fill me-1"></i>Active VIP</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted small">Standard</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoggedInUserDto? userDto;
+    private MemberProfileDto? memberProfileDto;
+    private string activeTab = "details";
+
+    private ProfileModelInput profileInput = new();
+    private ChangePasswordInput changePasswordInput = new();
+
+    private string? profileSuccessMessage;
+    private string? passwordErrorMessage;
+    private string? passwordSuccessMessage;
+
+    private bool isSavingProfile;
+    private bool isChangingPassword;
+
+    private class ProfileModelInput
+    {
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? PhoneNumber { get; set; }
+        public string? Gender { get; set; }
+        public decimal Height { get; set; }
+        public decimal CurrentWeight { get; set; }
+        public string? FitnessGoal { get; set; }
+    }
+
+    private class ChangePasswordInput
+    {
+        public string CurrentPassword { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
+        public string ConfirmNewPassword { get; set; } = string.Empty;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (Guid.TryParse(userIdClaim, out var userId))
+            {
+                userDto = await AuthService.GetUserByIdAsync(userId);
+                if (userDto != null)
+                {
+                    profileInput.FullName = userDto.FullName;
+                    profileInput.Email = userDto.Email;
+
+                    memberProfileDto = await UserService.GetProfileByUserIdAsync(userDto.UserId);
+                    if (memberProfileDto != null)
+                    {
+                        profileInput.Gender = memberProfileDto.Gender;
+                        profileInput.Height = memberProfileDto.Height;
+                        profileInput.CurrentWeight = memberProfileDto.CurrentWeight;
+                        profileInput.FitnessGoal = memberProfileDto.FitnessGoal;
+                    }
+                }
+            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("login");
+        }
+    }
+
+    private async Task HandleSaveProfile()
+    {
+        if (userDto == null) return;
+        isSavingProfile = true;
+        profileSuccessMessage = null;
+
+        try
+        {
+            var req = new UpsertMemberProfileRequest(
+                userDto.UserId,
+                profileInput.Gender,
+                null,
+                profileInput.Height,
+                profileInput.CurrentWeight,
+                profileInput.FitnessGoal
+            );
+
+            await UserService.UpsertProfileAsync(req);
+            profileSuccessMessage = "Profile updated successfully!";
+        }
+        catch
+        {
+            profileSuccessMessage = null;
+        }
+        finally
+        {
+            isSavingProfile = false;
+        }
+    }
+
+    private async Task HandleChangePassword()
+    {
+        if (userDto == null) return;
+        isChangingPassword = true;
+        passwordErrorMessage = null;
+        passwordSuccessMessage = null;
+
+        try
+        {
+            var req = new ChangePasswordRequest(
+                userDto.UserId,
+                changePasswordInput.CurrentPassword,
+                changePasswordInput.NewPassword,
+                changePasswordInput.ConfirmNewPassword
+            );
+
+            var result = await AuthService.ChangePasswordAsync(req);
+
+            if (result.Succeeded)
+            {
+                passwordSuccessMessage = "Password updated successfully!";
+                changePasswordInput = new ChangePasswordInput();
+            }
+            else
+            {
+                passwordErrorMessage = result.ErrorMessage ?? "Failed to update password.";
+            }
+        }
+        catch (Exception ex)
+        {
+            passwordErrorMessage = "An error occurred: " + ex.Message;
+        }
+        finally
+        {
+            isChangingPassword = false;
+        }
+    }
+
+    private static string GetInitials(string? fullName)
+    {
+        if (string.IsNullOrWhiteSpace(fullName)) return "U";
+        var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 1) return parts[0][..1].ToUpper();
+        return (parts[0][..1] + parts[^1][..1]).ToUpper();
+    }
+
+    private static string GetRoleBadgeClass(UserRole? role) => role switch
+    {
+        UserRole.Admin => "bg-danger bg-opacity-20 text-danger border border-danger border-opacity-20",
+        UserRole.Trainer => "bg-warning bg-opacity-20 text-warning border border-warning border-opacity-20",
+        UserRole.Member => "bg-success bg-opacity-20 text-success border border-success border-opacity-20",
+        _ => "bg-secondary bg-opacity-20 text-secondary"
+    };
+}

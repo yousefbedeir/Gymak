@@ -157,6 +157,58 @@ public class SubscriptionService : ISubscriptionService
         await _context.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<Guid> ProcessPremiumUpgradeAsync(
+        Guid userId,
+        Guid planId,
+        PaymentMethod paymentMethod,
+        string? transactionRef,
+        CancellationToken cancellationToken = default)
+    {
+        var plan = await _planRepository.GetByIdAsync(planId, cancellationToken)
+            ?? throw new InvalidOperationException($"Subscription Plan '{planId}' not found.");
+
+        var activeSubs = await _subscriptionRepository.GetByUserIdAsync(userId, cancellationToken);
+        foreach (var sub in activeSubs.Where(s => s.Status == SubscriptionStatus.Active))
+        {
+            sub.Status = SubscriptionStatus.Canceled;
+            sub.LastModifiedAt = DateTime.UtcNow;
+            _subscriptionRepository.Update(sub);
+        }
+
+        var startDate = DateTime.UtcNow;
+        var endDate = startDate.AddDays(plan.DurationDays);
+
+        var newSubscription = new Subscription
+        {
+            UserId = userId,
+            PlanId = planId,
+            StartDate = startDate,
+            EndDate = endDate,
+            AutoRenew = true,
+            Status = SubscriptionStatus.Active
+        };
+
+        await _subscriptionRepository.AddAsync(newSubscription, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        var payment = new Payment
+        {
+            SubscriptionId = newSubscription.Id,
+            UserId = userId,
+            Amount = plan.Price,
+            PaymentDate = DateTime.UtcNow,
+            PaymentMethod = paymentMethod,
+            Status = PaymentStatus.Completed,
+            TransactionReference = transactionRef ?? $"TXN-{Guid.NewGuid().ToString()[..8].ToUpper()}",
+            Notes = $"Premium upgrade to plan '{plan.Name}'"
+        };
+
+        await _context.Payments.AddAsync(payment, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return newSubscription.Id;
+    }
+
     // ── Mappers ───────────────────────────────────────────────────────────────
 
     private static SubscriptionPlanDto MapPlanToDto(SubscriptionPlan p) =>
