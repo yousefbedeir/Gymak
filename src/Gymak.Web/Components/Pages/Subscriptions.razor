@@ -7,102 +7,126 @@
 @inject IUserService UserService
 @rendermode InteractiveServer
 
-<PageTitle>Subscriptions & Financials - Gymak</PageTitle>
+<PageTitle>Subscriptions & Financials — Gymak</PageTitle>
 
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="py-2">
+    <!-- ─── Header ─── -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
         <div>
-            <h2 class="fw-bold mb-1"><i class="bi bi-card-checklist text-primary me-2"></i>Subscriptions & Financials</h2>
-            <p class="text-muted mb-0">Manage membership plans, active subscriptions, and payment transactions.</p>
+            <h4 class="fw-bold text-white mb-1" style="letter-spacing: -0.3px;">Subscriptions & Financials</h4>
+            <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">Manage membership plans, subscriptions, and payments</p>
         </div>
     </div>
 
-    <!-- Nav Tabs -->
-    <ul class="nav nav-tabs mb-4" id="subTabs" role="tablist">
-        <li class="nav-item">
-            <button class="nav-link @(activeTab == "plans" ? "active fw-bold" : "")" @onclick='() => activeTab = "plans"'>
-                <i class="bi bi-tags me-1"></i> Subscription Plans
+    <!-- ─── Tab Bar ─── -->
+    <div class="d-flex mb-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+        @foreach (var tab in new[] { ("plans", "bi-tags", "Plans"), ("subscriptions", "bi-person-badge", "Subscriptions"), ("payments", "bi-currency-dollar", "Payments") })
+        {
+            <button class="px-4 py-3 border-0 fw-semibold me-1"
+                    style="background: transparent; font-size: 0.88rem; cursor: pointer;
+                           color: @(activeTab == tab.Item1 ? "#fff" : "#6b7280");
+                           border-bottom: @(activeTab == tab.Item1 ? "2px solid #1e5adc" : "2px solid transparent") !important;"
+                    @onclick="() => activeTab = tab.Item1">
+                <i class="bi @tab.Item2 me-2"></i>@tab.Item3
             </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link @(activeTab == "subscriptions" ? "active fw-bold" : "")" @onclick='() => activeTab = "subscriptions"'>
-                <i class="bi bi-person-badge me-1"></i> Active Subscriptions
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link @(activeTab == "payments" ? "active fw-bold" : "")" @onclick='() => activeTab = "payments"'>
-                <i class="bi bi-currency-dollar me-1"></i> Payments & Revenue
-            </button>
-        </li>
-    </ul>
+        }
+    </div>
 
     @if (isLoading)
     {
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
+        <div class="text-center py-5" style="color: #6b7280;">
+            <div class="spinner-border spinner-border-sm me-2" style="color: #1e5adc;"></div>
+            Loading data...
         </div>
     }
     else
     {
+        <!-- ═══ PLANS TAB ═══ -->
         @if (activeTab == "plans")
         {
-            <div class="row g-4 mb-4">
+            <div class="row g-4">
+                <!-- Create Plan Form -->
                 <div class="col-md-4">
-                    <div class="card border-0 shadow-sm rounded-3">
-                        <div class="card-header bg-primary text-white py-3">
-                            <h5 class="card-title mb-0 fw-semibold"><i class="bi bi-plus-circle me-2"></i>Create Plan</h5>
-                        </div>
-                        <div class="card-body">
-                            <EditForm Model="newPlan" OnValidSubmit="HandleCreatePlan">
-                                <DataAnnotationsValidator />
-                                <div class="mb-3">
-                                    <label class="form-label font-monospace small text-muted">Plan Name</label>
-                                    <InputText class="form-control" @bind-Value="newPlan.Name" placeholder="e.g. Premium VIP" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label font-monospace small text-muted">Price ($)</label>
-                                    <InputNumber class="form-control" @bind-Value="newPlan.Price" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label font-monospace small text-muted">Billing Cycle</label>
-                                    <InputSelect class="form-select" @bind-Value="newPlan.BillingCycle">
-                                        @foreach (var cycle in Enum.GetValues<BillingCycle>())
-                                        {
-                                            <option value="@cycle">@cycle</option>
-                                        }
-                                    </InputSelect>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label font-monospace small text-muted">Duration (Days)</label>
-                                    <InputNumber class="form-control" @bind-Value="newPlan.DurationDays" required />
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label font-monospace small text-muted">Description</label>
-                                    <InputTextArea class="form-control" @bind-Value="newPlan.Description" rows="2" />
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Create Plan</button>
-                            </EditForm>
-                        </div>
+                    <div class="rounded p-4" style="background: #1a1a1a; border: 1px solid rgba(255,255,255,0.07);">
+                        <h6 class="fw-bold text-white mb-3" style="font-size: 0.9rem;">
+                            <i class="bi bi-plus-circle me-2" style="color: #3b7ff5;"></i>Create New Plan
+                        </h6>
+                        <EditForm Model="newPlan" OnValidSubmit="HandleCreatePlan">
+                            <DataAnnotationsValidator />
+                            <div class="mb-3">
+                                <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Plan Name</label>
+                                <InputText class="w-100 rounded py-2 px-3 text-white border-0"
+                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08) !important; font-size: 0.88rem; outline: none;"
+                                           @bind-Value="newPlan.Name" placeholder="e.g. Premium VIP" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Price ($)</label>
+                                <InputNumber class="w-100 rounded py-2 px-3 text-white border-0"
+                                             style="background: #111; border: 1px solid rgba(255,255,255,0.08) !important; font-size: 0.88rem; outline: none;"
+                                             @bind-Value="newPlan.Price" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Billing Cycle</label>
+                                <InputSelect class="w-100 rounded py-2 px-3 text-white"
+                                             style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                             @bind-Value="newPlan.BillingCycle">
+                                    @foreach (var cycle in Enum.GetValues<BillingCycle>())
+                                    {
+                                        <option value="@cycle">@cycle</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="mb-3">
+                                <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Duration (Days)</label>
+                                <InputNumber class="w-100 rounded py-2 px-3 text-white border-0"
+                                             style="background: #111; border: 1px solid rgba(255,255,255,0.08) !important; font-size: 0.88rem; outline: none;"
+                                             @bind-Value="newPlan.DurationDays" />
+                            </div>
+                            <div class="mb-4">
+                                <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Description</label>
+                                <InputTextArea class="w-100 rounded py-2 px-3 text-white border-0"
+                                               style="background: #111; border: 1px solid rgba(255,255,255,0.08) !important; font-size: 0.88rem; outline: none; resize: vertical;"
+                                               @bind-Value="newPlan.Description" rows="2" />
+                            </div>
+                            <button type="submit" class="w-100 border-0 rounded py-2 fw-bold text-white"
+                                    style="background: #1e5adc; font-size: 0.88rem; cursor: pointer;">
+                                Create Plan
+                            </button>
+                        </EditForm>
                     </div>
                 </div>
+
+                <!-- Plans Grid -->
                 <div class="col-md-8">
+                    @if (!plans.Any())
+                    {
+                        <div class="text-center py-5" style="color: #4b5563;">
+                            <i class="bi bi-tags d-block mb-2" style="font-size: 2rem; color: #374151;"></i>
+                            No plans created yet.
+                        </div>
+                    }
                     <div class="row g-3">
                         @foreach (var plan in plans)
                         {
                             <div class="col-md-6">
-                                <div class="card h-100 border-0 shadow-sm rounded-3">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <h4 class="fw-bold mb-0 text-primary">@plan.Name</h4>
-                                            <span class="badge bg-success fs-6">$@plan.Price</span>
-                                        </div>
-                                        <p class="text-muted small mb-2">@plan.Description</p>
-                                        <div class="d-flex justify-content-between small text-secondary border-top pt-2 mt-3">
-                                            <span><i class="bi bi-clock me-1"></i>@plan.BillingCycle (@plan.DurationDays Days)</span>
-                                            <span class="badge @(plan.IsActive ? "bg-info text-dark" : "bg-secondary")">@(plan.IsActive ? "Active" : "Inactive")</span>
-                                        </div>
+                                <div class="rounded p-3 h-100 d-flex flex-column"
+                                     style="background: #1a1a1a; border: 1px solid rgba(255,255,255,0.07); transition: border-color 0.2s;">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="fw-bold text-white mb-0" style="font-size: 0.95rem;">@plan.Name</h6>
+                                        <span class="px-2 py-1 rounded fw-bold font-monospace"
+                                              style="background: rgba(34,197,94,0.15); color: #22c55e; font-size: 0.8rem;">$@plan.Price</span>
+                                    </div>
+                                    <p class="small flex-grow-1 mb-3" style="color: #6b7280; font-size: 0.82rem;">@(plan.Description ?? "Full facility access")</p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2"
+                                         style="border-top: 1px solid rgba(255,255,255,0.07);">
+                                        <span style="color: #6b7280; font-size: 0.78rem;">
+                                            <i class="bi bi-clock me-1"></i>@plan.BillingCycle · @plan.DurationDays days
+                                        </span>
+                                        <span class="px-2 py-1 rounded" style="font-size: 0.72rem; font-weight: 600;
+                                              background: @(plan.IsActive ? "rgba(34,197,94,0.15)" : "rgba(107,114,128,0.15)");
+                                              color: @(plan.IsActive ? "#22c55e" : "#6b7280");">
+                                            @(plan.IsActive ? "Active" : "Inactive")
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -112,97 +136,123 @@
             </div>
         }
 
+        <!-- ═══ SUBSCRIPTIONS TAB ═══ -->
         @if (activeTab == "subscriptions")
         {
-            <div class="card border-0 shadow-sm rounded-3">
-                <div class="card-header bg-light py-3">
-                    <h5 class="mb-0 fw-semibold">Member Subscriptions</h5>
+            <div class="rounded overflow-hidden" style="background: #1a1a1a; border: 1px solid rgba(255,255,255,0.07);">
+                <div class="p-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                    <h6 class="fw-bold text-white mb-0" style="font-size: 0.9rem;">Member Subscriptions</h6>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
+                <div class="table-responsive">
+                    <table class="table mb-0" style="--bs-table-bg: transparent; color: #e5e7eb;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #1e5adc;">
+                                <th class="ps-4 py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Member</th>
+                                <th class="py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Plan</th>
+                                <th class="py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Start</th>
+                                <th class="py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">End</th>
+                                <th class="py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Status</th>
+                                <th class="pe-4 py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Auto Renew</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!subscriptions.Any())
+                            {
                                 <tr>
-                                    <th>Member</th>
-                                    <th>Plan</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Status</th>
-                                    <th>Auto Renew</th>
+                                    <td colspan="6" class="text-center py-5" style="color: #4b5563;">
+                                        <i class="bi bi-person-badge d-block mb-2" style="font-size: 2rem; color: #374151;"></i>
+                                        No subscriptions registered yet.
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @if (!subscriptions.Any())
-                                {
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted py-4">No subscriptions registered yet.</td>
-                                    </tr>
-                                }
-                                @foreach (var sub in subscriptions)
-                                {
-                                    <tr>
-                                        <td>
-                                            <div class="fw-bold">@sub.UserName</div>
-                                            <div class="small text-muted">@sub.UserEmail</div>
-                                        </td>
-                                        <td><span class="badge bg-primary">@sub.PlanName ($@sub.Price)</span></td>
-                                        <td>@sub.StartDate.ToString("MMM dd, yyyy")</td>
-                                        <td>@sub.EndDate.ToString("MMM dd, yyyy")</td>
-                                        <td>
-                                            <span class="badge @(sub.Status == SubscriptionStatus.Active ? "bg-success" : "bg-warning text-dark")">
-                                                @sub.Status
-                                            </span>
-                                        </td>
-                                        <td>@(sub.AutoRenew ? "Yes" : "No")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                            }
+                            @foreach (var sub in subscriptions)
+                            {
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td class="ps-4 py-3">
+                                        <div class="fw-semibold text-white" style="font-size: 0.88rem;">@sub.UserName</div>
+                                        <div style="font-size: 0.75rem; color: #6b7280;">@sub.UserEmail</div>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="px-2 py-1 rounded" style="background: rgba(30,90,220,0.15); color: #3b7ff5; font-size: 0.78rem; font-weight: 600;">
+                                            @sub.PlanName · $@sub.Price
+                                        </span>
+                                    </td>
+                                    <td class="py-3" style="color: #6b7280; font-size: 0.85rem;">@sub.StartDate.ToString("MMM dd, yyyy")</td>
+                                    <td class="py-3" style="color: #6b7280; font-size: 0.85rem;">@sub.EndDate.ToString("MMM dd, yyyy")</td>
+                                    <td class="py-3">
+                                        <span class="px-2 py-1 rounded" style="font-size: 0.75rem; font-weight: 600;
+                                              background: @(sub.Status == SubscriptionStatus.Active ? "rgba(34,197,94,0.15)" : "rgba(245,158,11,0.15)");
+                                              color: @(sub.Status == SubscriptionStatus.Active ? "#22c55e" : "#f59e0b");">
+                                            @sub.Status
+                                        </span>
+                                    </td>
+                                    <td class="pe-4 py-3" style="color: #6b7280; font-size: 0.85rem;">
+                                        @(sub.AutoRenew ? "Yes" : "No")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         }
 
+        <!-- ═══ PAYMENTS TAB ═══ -->
         @if (activeTab == "payments")
         {
-            <div class="card border-0 shadow-sm rounded-3">
-                <div class="card-header bg-light py-3">
-                    <h5 class="mb-0 fw-semibold">Payment History</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>User</th>
-                                    <th>Amount</th>
-                                    <th>Date</th>
-                                    <th>Method</th>
-                                    <th>Ref</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if (!payments.Any())
-                                {
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted py-4">No payment transactions recorded yet.</td>
-                                    </tr>
-                                }
-                                @foreach (var p in payments)
-                                {
-                                    <tr>
-                                        <td class="fw-bold">@p.UserName</td>
-                                        <td class="fw-bold text-success">$@p.Amount</td>
-                                        <td>@p.PaymentDate.ToString("MMM dd, yyyy HH:mm")</td>
-                                        <td>@p.PaymentMethod</td>
-                                        <td><code>@(p.TransactionReference ?? "N/A")</code></td>
-                                        <td><span class="badge bg-success">@p.Status</span></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+            <div class="rounded overflow-hidden" style="background: #1a1a1a; border: 1px solid rgba(255,255,255,0.07);">
+                <div class="p-4" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h6 class="fw-bold text-white mb-0" style="font-size: 0.9rem;">Payment History</h6>
+                        <span class="px-3 py-1 rounded fw-bold font-monospace"
+                              style="background: rgba(34,197,94,0.15); color: #22c55e; font-size: 0.85rem;">
+                            Total: $@payments.Where(p => p.Status == PaymentStatus.Completed).Sum(p => p.Amount).ToString("N2")
+                        </span>
                     </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0" style="--bs-table-bg: transparent; color: #e5e7eb;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #1e5adc;">
+                                <th class="ps-4 py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Member</th>
+                                <th class="py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Amount</th>
+                                <th class="py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Date</th>
+                                <th class="py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Method</th>
+                                <th class="py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Reference</th>
+                                <th class="pe-4 py-3" style="font-size: 0.7rem; letter-spacing: 1.5px; color: #6b7280; background: #1e1e1e; text-transform: uppercase;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!payments.Any())
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center py-5" style="color: #4b5563;">
+                                        <i class="bi bi-receipt d-block mb-2" style="font-size: 2rem; color: #374151;"></i>
+                                        No payment transactions recorded yet.
+                                    </td>
+                                </tr>
+                            }
+                            @foreach (var p in payments)
+                            {
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td class="ps-4 py-3 fw-semibold text-white" style="font-size: 0.88rem;">@p.UserName</td>
+                                    <td class="py-3 fw-bold font-monospace" style="color: #22c55e;">$@p.Amount.ToString("N2")</td>
+                                    <td class="py-3" style="color: #6b7280; font-size: 0.85rem;">@p.PaymentDate.ToString("MMM dd, yyyy")</td>
+                                    <td class="py-3" style="color: #6b7280; font-size: 0.85rem;">@p.PaymentMethod</td>
+                                    <td class="py-3">
+                                        <code style="color: #6b7280; font-size: 0.78rem;">@(p.TransactionReference ?? "N/A")</code>
+                                    </td>
+                                    <td class="pe-4 py-3">
+                                        <span class="px-2 py-1 rounded" style="font-size: 0.75rem; font-weight: 600;
+                                              background: @(p.Status == PaymentStatus.Completed ? "rgba(34,197,94,0.15)" : "rgba(245,158,11,0.15)");
+                                              color: @(p.Status == PaymentStatus.Completed ? "#22c55e" : "#f59e0b");">
+                                            @p.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         }
@@ -216,47 +266,26 @@
     private List<SubscriptionPlanDto> plans = new();
     private List<SubscriptionDto> subscriptions = new();
     private List<PaymentDto> payments = new();
-
     private PlanFormModel newPlan = new();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadDataAsync();
-    }
+    protected override async Task OnInitializedAsync() => await LoadDataAsync();
 
     private async Task LoadDataAsync()
     {
         isLoading = true;
         try
         {
-            var pList = await SubscriptionService.GetAllPlansAsync(activeOnly: false);
-            plans = pList.ToList();
-
-            var sList = await SubscriptionService.GetAllSubscriptionsAsync();
-            subscriptions = sList.ToList();
-
-            var payList = await PaymentService.GetAllPaymentsAsync();
-            payments = payList.ToList();
+            plans = (await SubscriptionService.GetAllPlansAsync(activeOnly: false)).ToList();
+            subscriptions = (await SubscriptionService.GetAllSubscriptionsAsync()).ToList();
+            payments = (await PaymentService.GetAllPaymentsAsync()).ToList();
         }
-        finally
-        {
-            isLoading = false;
-        }
+        finally { isLoading = false; }
     }
 
     private async Task HandleCreatePlan()
     {
-        var request = new CreateSubscriptionPlanRequest(
-            newPlan.Name,
-            newPlan.Description,
-            newPlan.Price,
-            newPlan.BillingCycle,
-            newPlan.DurationDays,
-            newPlan.Features
-        );
-
-        await SubscriptionService.CreatePlanAsync(request);
-        newPlan = new PlanFormModel();
+        await SubscriptionService.CreatePlanAsync(new CreateSubscriptionPlanRequest(newPlan.Name, newPlan.Description, newPlan.Price, newPlan.BillingCycle, newPlan.DurationDays, newPlan.Features));
+        newPlan = new();
         await LoadDataAsync();
     }
 

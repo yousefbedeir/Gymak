@@ -10,69 +10,65 @@
     <div class="main-wrapper flex-grow-1 d-flex flex-column">
         <!-- Top Header -->
         <header class="top-header px-4 d-flex align-items-center justify-content-between">
-            <!-- Left: Search -->
+            <!-- Left: Page Title / Search -->
             <div class="d-flex align-items-center gap-3">
-                <div class="search-box position-relative d-none d-sm-flex align-items-center" style="width: 260px;">
-                    <i class="bi bi-search position-absolute ms-3 text-muted" style="font-size: 0.85rem;"></i>
-                    <input type="text" class="form-control form-control-dark ps-5" placeholder="Search members, plans..." />
+                <div class="search-box position-relative d-none d-sm-flex align-items-center" style="width: 240px;">
+                    <i class="bi bi-search position-absolute ms-3 text-muted" style="font-size: 0.8rem;"></i>
+                    <input type="text" class="form-control form-control-dark ps-5" placeholder="Search..." />
                 </div>
             </div>
 
-            <!-- Right: Status + User Actions -->
+            <!-- Right: Status & User -->
             <div class="d-flex align-items-center gap-2">
-                <!-- SQL Server Status Badge -->
-                <div class="d-none d-md-flex align-items-center gap-2 px-3 py-1.5 rounded-pill"
-                     style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); font-size: 0.78rem;">
-                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; display: inline-block;"></span>
-                    <span class="text-muted">SQL Server</span>
+                <!-- DB Status -->
+                <div class="d-none d-md-flex align-items-center gap-2 px-3 py-1 rounded"
+                     style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); font-size: 0.78rem;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #22c55e; display: inline-block;"></span>
+                    <span style="color: #6b7280;">Database</span>
                     <span class="fw-semibold text-white">Connected</span>
                 </div>
 
-                <!-- User Auth State -->
+                <!-- Auth Actions -->
                 <AuthorizeView>
                     <Authorized>
                         <div class="d-flex align-items-center gap-2">
                             <!-- User Pill -->
-                            <a href="profile" class="d-flex align-items-center gap-2 px-3 py-1.5 rounded-pill text-decoration-none"
-                               style="background: rgba(14,165,233,0.1); border: 1px solid rgba(14,165,233,0.25); font-size: 0.82rem; transition: all 0.2s;">
-                                <div class="d-flex align-items-center justify-content-center fw-bold rounded-circle text-white"
-                                     style="width: 26px; height: 26px; background: linear-gradient(135deg,#0ea5e9,#6366f1); font-size: 0.7rem; flex-shrink: 0;">
+                            <a href="profile" class="d-flex align-items-center gap-2 px-3 py-1 rounded text-decoration-none"
+                               style="background: #1e1e1e; border: 1px solid rgba(255,255,255,0.1); font-size: 0.82rem; transition: border-color 0.2s;">
+                                <div class="d-flex align-items-center justify-content-center fw-bold text-white rounded flex-shrink-0"
+                                     style="width: 26px; height: 26px; background: #1e5adc; font-size: 0.7rem;">
                                     @GetInitials(context.User.Identity?.Name)
                                 </div>
                                 <span class="fw-semibold text-white d-none d-md-block">@context.User.Identity?.Name</span>
-                                <span class="badge text-muted d-none d-lg-inline-block"
-                                      style="font-size: 0.65rem; background: rgba(255,255,255,0.06);">
-                                    @context.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
-                                </span>
                             </a>
-                            <!-- Logout Button -->
-                            <button class="d-flex align-items-center justify-content-center rounded-circle border-0"
-                                    style="width: 36px; height: 36px; background: rgba(244,63,94,0.12); color: #fb7185; transition: all 0.2s;"
+                            <!-- Logout -->
+                            <button class="d-flex align-items-center justify-content-center rounded border-0"
+                                    style="width: 34px; height: 34px; background: rgba(239,68,68,0.1); color: #ef4444; transition: background 0.2s;"
                                     title="Sign Out" @onclick="HandleLogout">
-                                <i class="bi bi-power" style="font-size: 0.95rem;"></i>
+                                <i class="bi bi-power" style="font-size: 0.9rem;"></i>
                             </button>
                         </div>
                     </Authorized>
                     <NotAuthorized>
                         <div class="d-flex align-items-center gap-2">
-                            <a href="login" class="btn btn-sm fw-semibold rounded-3 px-3"
-                               style="background: rgba(14,165,233,0.12); border: 1px solid rgba(14,165,233,0.3); color: #38bdf8;">Sign In</a>
-                            <a href="register" class="btn btn-sm fw-semibold rounded-3 px-3"
-                               style="background: linear-gradient(135deg, #0ea5e9, #3b82f6); color: white; border: none;">Register</a>
+                            <a href="login" class="btn btn-sm fw-semibold rounded px-3"
+                               style="background: transparent; border: 1px solid rgba(30,90,220,0.5); color: #3b7ff5;">Sign In</a>
+                            <a href="register" class="btn btn-sm fw-bold rounded px-3"
+                               style="background: #1e5adc; color: white; border: none;">Register</a>
                         </div>
                     </NotAuthorized>
                 </AuthorizeView>
             </div>
         </header>
 
-        <!-- Main Body View -->
+        <!-- Main Body -->
         <main class="content-wrapper flex-grow-1 p-4">
             @Body
         </main>
 
         <!-- Footer -->
         <footer class="footer px-4 py-3 d-flex justify-content-between align-items-center">
-            <span><i class="bi bi-lightning-charge-fill text-info me-1" style="font-size: 0.7rem;"></i>© 2026 Gymak Fitness OS. All rights reserved.</span>
+            <span>© 2026 Gymak Fitness OS. All rights reserved.</span>
             <span>Powered by .NET 9 & EF Core</span>
         </footer>
     </div>

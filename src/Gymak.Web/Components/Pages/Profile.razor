@@ -10,136 +10,151 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 
-<PageTitle>My Profile - Gymak Fitness OS</PageTitle>
+<PageTitle>My Profile — Gymak Fitness OS</PageTitle>
 
-<div class="container-fluid py-4">
-    <!-- Header Banner -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 rounded-4 overflow-hidden position-relative" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(255, 255, 255, 0.08) !important;">
-                <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
-                    <div class="d-flex align-items-center gap-4">
-                        <div class="avatar-lg bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-1 shadow-lg" style="width: 80px; height: 80px; box-shadow: 0 0 25px rgba(14, 165, 233, 0.3) !important;">
-                            @GetInitials(userDto?.FullName)
-                        </div>
-                        <div>
-                            <div class="d-flex align-items-center gap-2 mb-1">
-                                <h3 class="fw-bold text-white mb-0">@(userDto?.FullName ?? "User Profile")</h3>
-                                <span class="badge @GetRoleBadgeClass(userDto?.Role) px-3 py-1 rounded-pill fs-7">
-                                    @(userDto?.Role.ToString() ?? "User")
-                                </span>
-                                @if (userDto?.IsPremium == true)
-                                {
-                                    <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-20 px-3 py-1 rounded-pill fs-7">
-                                        <i class="bi bi-star-fill me-1"></i>PRO VIP
-                                    </span>
-                                }
-                            </div>
-                            <p class="text-muted mb-0 small"><i class="bi bi-envelope me-1"></i>@(userDto?.Email)</p>
-                        </div>
-                    </div>
+<div class="py-2">
 
-                    <div class="d-flex gap-2">
-                        <a href="subscriptions" class="btn btn-outline-primary rounded-3 px-3 py-2 btn-sm d-flex align-items-center gap-2">
-                            <i class="bi bi-credit-card-2-front-fill"></i> Subscription Plans
-                        </a>
-                    </div>
+    <!-- ─── Profile Header ─── -->
+    <div class="p-4 p-md-5 rounded mb-4 d-flex flex-column flex-md-row align-items-center justify-content-between gap-4"
+         style="background: linear-gradient(135deg, #1a2a5e 0%, #0d1a40 50%, #111 100%); border: 1px solid rgba(30,90,220,0.3);">
+        <div class="d-flex align-items-center gap-4">
+            <div class="d-flex align-items-center justify-content-center fw-bold text-white rounded"
+                 style="width: 72px; height: 72px; background: #1e5adc; font-size: 1.6rem; flex-shrink: 0;">
+                @GetInitials(userDto?.FullName)
+            </div>
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                    <h3 class="fw-bold text-white mb-0" style="letter-spacing: -0.5px;">@(userDto?.FullName ?? "User Profile")</h3>
+                    <span class="px-2 py-1 rounded fw-600" style="font-size: 0.75rem; @GetRoleStyle(userDto?.Role)">@(userDto?.Role.ToString() ?? "User")</span>
+                    @if (userDto?.IsPremium == true)
+                    {
+                        <span class="px-2 py-1 rounded fw-600" style="font-size: 0.75rem; background: rgba(245,158,11,0.15); color: #f59e0b;">
+                            <i class="bi bi-star-fill me-1"></i>VIP
+                        </span>
+                    }
                 </div>
+                <p class="mb-0" style="color: #6b7280; font-size: 0.88rem;">
+                    <i class="bi bi-envelope me-1"></i>@(userDto?.Email)
+                </p>
             </div>
         </div>
+        <a href="subscriptions" class="btn rounded d-flex align-items-center gap-2"
+           style="background: rgba(30,90,220,0.2); border: 1px solid rgba(30,90,220,0.4); color: #3b7ff5; font-size: 0.85rem; white-space: nowrap;">
+            <i class="bi bi-credit-card-fill"></i> Subscription Plans
+        </a>
     </div>
 
-    <!-- Tabs & Content -->
-    <div class="row">
-        <div class="col-lg-8 mb-4">
-            <div class="card border-0 rounded-4 text-white" style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08) !important;">
-                <div class="card-header bg-transparent border-bottom border-secondary border-opacity-10 p-3 p-md-4">
-                    <ul class="nav nav-pills card-header-pills gap-2">
-                        <li class="nav-item">
-                            <button class="nav-link @(activeTab == "details" ? "active bg-primary" : "text-white-50") px-4 py-2 rounded-3 small fw-semibold" @onclick='() => activeTab = "details"'>
-                                <i class="bi bi-person-badge me-2"></i>Personal Details
-                            </button>
-                        </li>
-                        <li class="nav-item">
-                            <button class="nav-link @(activeTab == "security" ? "active bg-primary" : "text-white-50") px-4 py-2 rounded-3 small fw-semibold" @onclick='() => activeTab = "security"'>
-                                <i class="bi bi-shield-lock me-2"></i>Security & Password
-                            </button>
-                        </li>
-                    </ul>
+    <div class="row g-4">
+        <!-- ─── Main Form ─── -->
+        <div class="col-lg-8">
+            <div class="rounded overflow-hidden" style="background: #1a1a1a; border: 1px solid rgba(255,255,255,0.07);">
+                <!-- Tab Bar -->
+                <div class="d-flex" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                    <button class="px-4 py-3 border-0 fw-semibold"
+                            style="background: transparent; font-size: 0.88rem; cursor: pointer;
+                                   color: @(activeTab == "details" ? "#fff" : "#6b7280");
+                                   border-bottom: @(activeTab == "details" ? "2px solid #1e5adc" : "2px solid transparent") !important;"
+                            @onclick='() => activeTab = "details"'>
+                        <i class="bi bi-person-badge me-2"></i>Personal Details
+                    </button>
+                    <button class="px-4 py-3 border-0 fw-semibold"
+                            style="background: transparent; font-size: 0.88rem; cursor: pointer;
+                                   color: @(activeTab == "security" ? "#fff" : "#6b7280");
+                                   border-bottom: @(activeTab == "security" ? "2px solid #1e5adc" : "2px solid transparent") !important;"
+                            @onclick='() => activeTab = "security"'>
+                        <i class="bi bi-shield-lock me-2"></i>Security & Password
+                    </button>
                 </div>
 
-                <div class="card-body p-4">
+                <div class="p-4">
                     @if (activeTab == "details")
                     {
                         @if (profileSuccessMessage != null)
                         {
-                            <div class="alert alert-success border-0 bg-success bg-opacity-20 text-success py-2 px-3 rounded-3 small mb-4">
-                                <i class="bi bi-check-circle-fill me-2"></i>@profileSuccessMessage
+                            <div class="d-flex align-items-center gap-2 p-3 rounded mb-4"
+                                 style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; font-size: 0.85rem;">
+                                <i class="bi bi-check-circle-fill"></i> @profileSuccessMessage
                             </div>
                         }
 
                         <EditForm Model="profileInput" OnValidSubmit="HandleSaveProfile">
-                            <h6 class="text-uppercase text-muted font-monospace mb-3 fs-7" style="letter-spacing: 1px;">Account Overview</h6>
-                            
+                            <p class="mb-3 fw-600 text-uppercase" style="font-size: 0.7rem; letter-spacing: 2px; color: #374151;">Account Overview</p>
+
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">Full Name</label>
-                                    <input type="text" class="form-control bg-dark border-0 text-white" @bind="profileInput.FullName" readonly />
+                                    <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Full Name</label>
+                                    <input type="text" class="w-100 rounded py-2 px-3 text-white"
+                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none; color: #9ca3af !important;"
+                                           @bind="profileInput.FullName" readonly />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">Email Address</label>
-                                    <input type="email" class="form-control bg-dark border-0 text-white" @bind="profileInput.Email" readonly />
+                                    <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Email Address</label>
+                                    <input type="email" class="w-100 rounded py-2 px-3"
+                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none; color: #9ca3af !important;"
+                                           @bind="profileInput.Email" readonly />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">Phone Number</label>
-                                    <input type="text" class="form-control bg-dark border-0 text-white" @bind="profileInput.PhoneNumber" placeholder="Add phone number..." />
+                                    <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Phone Number</label>
+                                    <input type="text" class="w-100 rounded py-2 px-3 text-white"
+                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                           @bind="profileInput.PhoneNumber" placeholder="Add phone number..." />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">Role</label>
-                                    <input type="text" class="form-control bg-dark border-0 text-white" value="@(userDto?.Role.ToString())" readonly />
+                                    <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Role</label>
+                                    <input type="text" class="w-100 rounded py-2 px-3"
+                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none; color: #9ca3af !important;"
+                                           value="@(userDto?.Role.ToString())" readonly />
                                 </div>
                             </div>
 
                             @if (memberProfileDto != null || userDto?.Role == UserRole.Member)
                             {
-                                <hr class="border-secondary border-opacity-10 my-4" />
-                                <h6 class="text-uppercase text-muted font-monospace mb-3 fs-7" style="letter-spacing: 1px;">Fitness Profile & Body Metrics</h6>
-                                
+                                <div style="border-top: 1px solid rgba(255,255,255,0.07);" class="pt-4 mt-2"></div>
+                                <p class="mb-3 fw-600 text-uppercase" style="font-size: 0.7rem; letter-spacing: 2px; color: #374151;">Fitness Profile & Body Metrics</p>
+
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-4">
-                                        <label class="form-label text-white-50 small">Height (cm)</label>
-                                        <input type="number" step="0.1" class="form-control bg-dark border-0 text-white" @bind="profileInput.Height" placeholder="175" />
+                                        <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Height (cm)</label>
+                                        <input type="number" step="0.1" class="w-100 rounded py-2 px-3 text-white"
+                                               style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                               @bind="profileInput.Height" placeholder="175" />
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label text-white-50 small">Current Weight (kg)</label>
-                                        <input type="number" step="0.1" class="form-control bg-dark border-0 text-white" @bind="profileInput.CurrentWeight" placeholder="70" />
+                                        <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Current Weight (kg)</label>
+                                        <input type="number" step="0.1" class="w-100 rounded py-2 px-3 text-white"
+                                               style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                               @bind="profileInput.CurrentWeight" placeholder="70" />
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="form-label text-white-50 small">Gender</label>
-                                        <select class="form-select bg-dark border-0 text-white" @bind="profileInput.Gender">
+                                        <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Gender</label>
+                                        <select class="w-100 rounded py-2 px-3 text-white"
+                                                style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                                @bind="profileInput.Gender">
                                             <option value="">Select Gender</option>
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-12">
-                                        <label class="form-label text-white-50 small">Fitness Goal</label>
-                                        <input type="text" class="form-control bg-dark border-0 text-white" @bind="profileInput.FitnessGoal" placeholder="e.g. Muscle Gain, Weight Loss, General Fitness" />
+                                    <div class="col-12">
+                                        <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Fitness Goal</label>
+                                        <input type="text" class="w-100 rounded py-2 px-3 text-white"
+                                               style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                               @bind="profileInput.FitnessGoal" placeholder="e.g. Muscle Gain, Weight Loss..." />
                                     </div>
                                 </div>
                             }
 
                             <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-semibold small" disabled="@isSavingProfile">
+                                <button type="submit" class="btn rounded fw-bold px-4 py-2 d-flex align-items-center gap-2"
+                                        style="background: #1e5adc; color: white; border: none; font-size: 0.88rem;"
+                                        disabled="@isSavingProfile">
                                     @if (isSavingProfile)
                                     {
-                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                        <span>Saving...</span>
+                                        <span class="spinner-border spinner-border-sm"></span><span>Saving...</span>
                                     }
                                     else
                                     {
-                                        <i class="bi bi-save me-1"></i>
-                                        <span>Save Profile</span>
+                                        <i class="bi bi-save"></i><span>Save Profile</span>
                                     }
                                 </button>
                             </div>
@@ -149,48 +164,53 @@
                     {
                         @if (passwordErrorMessage != null)
                         {
-                            <div class="alert alert-danger border-0 bg-danger bg-opacity-20 text-danger py-2 px-3 rounded-3 small mb-4">
-                                <i class="bi bi-exclamation-triangle-fill me-2"></i>@passwordErrorMessage
+                            <div class="d-flex align-items-center gap-2 p-3 rounded mb-4"
+                                 style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; font-size: 0.85rem;">
+                                <i class="bi bi-exclamation-circle-fill"></i> @passwordErrorMessage
                             </div>
                         }
-
                         @if (passwordSuccessMessage != null)
                         {
-                            <div class="alert alert-success border-0 bg-success bg-opacity-20 text-success py-2 px-3 rounded-3 small mb-4">
-                                <i class="bi bi-check-circle-fill me-2"></i>@passwordSuccessMessage
+                            <div class="d-flex align-items-center gap-2 p-3 rounded mb-4"
+                                 style="background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; font-size: 0.85rem;">
+                                <i class="bi bi-check-circle-fill"></i> @passwordSuccessMessage
                             </div>
                         }
 
                         <EditForm Model="changePasswordInput" OnValidSubmit="HandleChangePassword">
-                            <h6 class="text-uppercase text-muted font-monospace mb-3 fs-7" style="letter-spacing: 1px;">Change Password</h6>
-                            
-                            <div class="mb-3">
-                                <label class="form-label text-white-50 small">Current Password</label>
-                                <input type="password" class="form-control bg-dark border-0 text-white" @bind="changePasswordInput.CurrentPassword" required placeholder="••••••••" />
-                            </div>
+                            <p class="mb-3 fw-600 text-uppercase" style="font-size: 0.7rem; letter-spacing: 2px; color: #374151;">Change Password</p>
 
+                            <div class="mb-3">
+                                <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Current Password</label>
+                                <input type="password" class="w-100 rounded py-2 px-3 text-white"
+                                       style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                       @bind="changePasswordInput.CurrentPassword" placeholder="••••••••" required />
+                            </div>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">New Password</label>
-                                    <input type="password" class="form-control bg-dark border-0 text-white" @bind="changePasswordInput.NewPassword" required placeholder="••••••••" />
+                                    <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">New Password</label>
+                                    <input type="password" class="w-100 rounded py-2 px-3 text-white"
+                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                           @bind="changePasswordInput.NewPassword" placeholder="••••••••" required />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">Confirm New Password</label>
-                                    <input type="password" class="form-control bg-dark border-0 text-white" @bind="changePasswordInput.ConfirmNewPassword" required placeholder="••••••••" />
+                                    <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Confirm New Password</label>
+                                    <input type="password" class="w-100 rounded py-2 px-3 text-white"
+                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                           @bind="changePasswordInput.ConfirmNewPassword" placeholder="••••••••" required />
                                 </div>
                             </div>
-
                             <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-warning px-4 py-2 rounded-3 fw-semibold small text-dark" disabled="@isChangingPassword">
+                                <button type="submit" class="btn rounded fw-bold px-4 py-2 d-flex align-items-center gap-2"
+                                        style="background: #f59e0b; color: #111; border: none; font-size: 0.88rem;"
+                                        disabled="@isChangingPassword">
                                     @if (isChangingPassword)
                                     {
-                                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                        <span>Updating Password...</span>
+                                        <span class="spinner-border spinner-border-sm"></span><span>Updating...</span>
                                     }
                                     else
                                     {
-                                        <i class="bi bi-key-fill me-1"></i>
-                                        <span>Update Password</span>
+                                        <i class="bi bi-key-fill"></i><span>Update Password</span>
                                     }
                                 </button>
                             </div>
@@ -200,34 +220,50 @@
             </div>
         </div>
 
-        <!-- Sidebar Info Widget -->
+        <!-- ─── Sidebar ─── -->
         <div class="col-lg-4">
-            <div class="card border-0 rounded-4 text-white mb-4" style="background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08) !important;">
-                <div class="card-body p-4">
-                    <h6 class="text-uppercase text-muted font-monospace mb-3 fs-7" style="letter-spacing: 1px;">Account Status</h6>
-                    
-                    <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-secondary border-opacity-10">
-                        <span class="text-muted small">Status</span>
-                        <span class="badge bg-success bg-opacity-20 text-success">Active Account</span>
-                    </div>
-
-                    <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-secondary border-opacity-10">
-                        <span class="text-muted small">Role Tier</span>
-                        <span class="text-white fw-semibold small">@(userDto?.Role.ToString())</span>
-                    </div>
-
-                    <div class="d-flex align-items-center justify-content-between py-2">
-                        <span class="text-muted small">Membership</span>
-                        @if (userDto?.IsPremium == true)
-                        {
-                            <span class="text-warning fw-semibold small"><i class="bi bi-check-circle-fill me-1"></i>Active VIP</span>
-                        }
-                        else
-                        {
-                            <span class="text-muted small">Standard</span>
-                        }
-                    </div>
+            <div class="rounded p-4" style="background: #1a1a1a; border: 1px solid rgba(255,255,255,0.07);">
+                <p class="mb-3 fw-600 text-uppercase" style="font-size: 0.7rem; letter-spacing: 2px; color: #374151;">Account Status</p>
+                <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                    <span style="color: #6b7280; font-size: 0.85rem;">Status</span>
+                    <span class="px-2 py-1 rounded" style="background: rgba(34,197,94,0.15); color: #22c55e; font-size: 0.75rem; font-weight: 600;">Active</span>
                 </div>
+                <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                    <span style="color: #6b7280; font-size: 0.85rem;">Role Tier</span>
+                    <span class="fw-semibold text-white" style="font-size: 0.88rem;">@(userDto?.Role.ToString())</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                    <span style="color: #6b7280; font-size: 0.85rem;">Membership</span>
+                    @if (userDto?.IsPremium == true)
+                    {
+                        <span style="color: #f59e0b; font-size: 0.85rem; font-weight: 600;"><i class="bi bi-check-circle-fill me-1"></i>VIP Active</span>
+                    }
+                    else
+                    {
+                        <span style="color: #6b7280; font-size: 0.85rem;">Standard</span>
+                    }
+                </div>
+
+                @if (memberProfileDto != null)
+                {
+                    <div class="mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.07);">
+                        <p class="mb-3 fw-600 text-uppercase" style="font-size: 0.7rem; letter-spacing: 2px; color: #374151;">Body Stats</p>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="p-2 rounded text-center" style="background: #111; border: 1px solid rgba(255,255,255,0.07);">
+                                    <div class="fw-bold text-white" style="font-size: 1.1rem;">@memberProfileDto.Height</div>
+                                    <div style="color: #6b7280; font-size: 0.7rem;">Height cm</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 rounded text-center" style="background: #111; border: 1px solid rgba(255,255,255,0.07);">
+                                    <div class="fw-bold text-white" style="font-size: 1.1rem;">@memberProfileDto.CurrentWeight</div>
+                                    <div style="color: #6b7280; font-size: 0.7rem;">Weight kg</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -244,7 +280,6 @@
     private string? profileSuccessMessage;
     private string? passwordErrorMessage;
     private string? passwordSuccessMessage;
-
     private bool isSavingProfile;
     private bool isChangingPassword;
 
@@ -270,7 +305,6 @@
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-
         if (user.Identity?.IsAuthenticated == true)
         {
             var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -281,7 +315,7 @@
                 {
                     profileInput.FullName = userDto.FullName;
                     profileInput.Email = userDto.Email;
-
+                    // PhoneNumber loaded from member profile if available
                     memberProfileDto = await UserService.GetProfileByUserIdAsync(userDto.UserId);
                     if (memberProfileDto != null)
                     {
@@ -293,78 +327,34 @@
                 }
             }
         }
-        else
-        {
-            NavigationManager.NavigateTo("login");
-        }
+        else { NavigationManager.NavigateTo("login"); }
     }
 
     private async Task HandleSaveProfile()
     {
         if (userDto == null) return;
-        isSavingProfile = true;
-        profileSuccessMessage = null;
-
+        isSavingProfile = true; profileSuccessMessage = null;
         try
         {
-            var req = new UpsertMemberProfileRequest(
-                userDto.UserId,
-                profileInput.Gender,
-                null,
-                profileInput.Height,
-                profileInput.CurrentWeight,
-                profileInput.FitnessGoal
-            );
-
-            await UserService.UpsertProfileAsync(req);
+            await UserService.UpsertProfileAsync(new UpsertMemberProfileRequest(userDto.UserId, profileInput.Gender, null, profileInput.Height, profileInput.CurrentWeight, profileInput.FitnessGoal));
             profileSuccessMessage = "Profile updated successfully!";
         }
-        catch
-        {
-            profileSuccessMessage = null;
-        }
-        finally
-        {
-            isSavingProfile = false;
-        }
+        catch { }
+        finally { isSavingProfile = false; }
     }
 
     private async Task HandleChangePassword()
     {
         if (userDto == null) return;
-        isChangingPassword = true;
-        passwordErrorMessage = null;
-        passwordSuccessMessage = null;
-
+        isChangingPassword = true; passwordErrorMessage = null; passwordSuccessMessage = null;
         try
         {
-            var req = new ChangePasswordRequest(
-                userDto.UserId,
-                changePasswordInput.CurrentPassword,
-                changePasswordInput.NewPassword,
-                changePasswordInput.ConfirmNewPassword
-            );
-
-            var result = await AuthService.ChangePasswordAsync(req);
-
-            if (result.Succeeded)
-            {
-                passwordSuccessMessage = "Password updated successfully!";
-                changePasswordInput = new ChangePasswordInput();
-            }
-            else
-            {
-                passwordErrorMessage = result.ErrorMessage ?? "Failed to update password.";
-            }
+            var result = await AuthService.ChangePasswordAsync(new ChangePasswordRequest(userDto.UserId, changePasswordInput.CurrentPassword, changePasswordInput.NewPassword, changePasswordInput.ConfirmNewPassword));
+            if (result.Succeeded) { passwordSuccessMessage = "Password updated successfully!"; changePasswordInput = new(); }
+            else { passwordErrorMessage = result.ErrorMessage ?? "Failed to update password."; }
         }
-        catch (Exception ex)
-        {
-            passwordErrorMessage = "An error occurred: " + ex.Message;
-        }
-        finally
-        {
-            isChangingPassword = false;
-        }
+        catch (Exception ex) { passwordErrorMessage = "An error occurred: " + ex.Message; }
+        finally { isChangingPassword = false; }
     }
 
     private static string GetInitials(string? fullName)
@@ -375,11 +365,11 @@
         return (parts[0][..1] + parts[^1][..1]).ToUpper();
     }
 
-    private static string GetRoleBadgeClass(UserRole? role) => role switch
+    private static string GetRoleStyle(UserRole? role) => role switch
     {
-        UserRole.Admin => "bg-danger bg-opacity-20 text-danger border border-danger border-opacity-20",
-        UserRole.Trainer => "bg-warning bg-opacity-20 text-warning border border-warning border-opacity-20",
-        UserRole.Member => "bg-success bg-opacity-20 text-success border border-success border-opacity-20",
-        _ => "bg-secondary bg-opacity-20 text-secondary"
+        UserRole.Admin => "background: rgba(239,68,68,0.15); color: #ef4444;",
+        UserRole.Trainer => "background: rgba(245,158,11,0.15); color: #f59e0b;",
+        UserRole.Member => "background: rgba(34,197,94,0.15); color: #22c55e;",
+        _ => "background: rgba(156,163,175,0.15); color: #9ca3af;"
     };
 }
