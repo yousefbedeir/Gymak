@@ -12,6 +12,7 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddScoped<IMemberService, MemberService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IWorkoutService, WorkoutService>();
 
         return services;
     }
