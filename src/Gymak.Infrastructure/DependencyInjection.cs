@@ -37,6 +37,10 @@ public static class DependencyInjection
         services.AddScoped<IWorkoutPlanRepository, WorkoutPlanRepository>();
         services.AddScoped<IWorkoutLogRepository, WorkoutLogRepository>();
 
+        // Module 3: Nutrition & Diet
+        services.AddScoped<IFoodItemRepository, FoodItemRepository>();
+        services.AddScoped<IDietPlanRepository, DietPlanRepository>();
+
         return services;
     }
 }

@@ -26,6 +26,11 @@ public class AppDbContext : DbContext, IApplicationDbContext
     public DbSet<WorkoutPlanExercise> WorkoutPlanExercises => Set<WorkoutPlanExercise>();
     public DbSet<WorkoutLog> WorkoutLogs => Set<WorkoutLog>();
 
+    // Module 3: Nutrition & Diet
+    public DbSet<FoodItem> FoodItems => Set<FoodItem>();
+    public DbSet<DietPlan> DietPlans => Set<DietPlan>();
+    public DbSet<MealItem> MealItems => Set<MealItem>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
