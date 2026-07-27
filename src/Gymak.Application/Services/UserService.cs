@@ -159,4 +159,34 @@ public class UserService : IUserService
             tc.Status
         )).ToList();
     }
+    public async Task<Guid?> AutoAssignTrainerAsync(Guid memberId, CancellationToken cancellationToken = default)
+    {
+        // Get all trainers
+        var trainers = await _userRepository.GetAllByRoleAsync(UserRole.Trainer, cancellationToken);
+        if (!trainers.Any()) return null;
+
+        // Find trainer with fewest active clients
+        var trainerClientCounts = new List<(Guid TrainerId, int Count)>();
+        foreach (var trainer in trainers)
+        {
+            var clients = await _trainerClientRepository.GetClientsForTrainerAsync(trainer.Id, cancellationToken);
+            var activeCount = clients.Count(c => c.Status == AssignmentStatus.Active);
+            trainerClientCounts.Add((trainer.Id, activeCount));
+        }
+
+        var bestTrainer = trainerClientCounts.MinBy(x => x.Count);
+
+        var assignment = new TrainerClient
+        {
+            TrainerId = bestTrainer.TrainerId,
+            ClientId = memberId,
+            StartDate = DateTime.UtcNow,
+            Status = AssignmentStatus.Active
+        };
+
+        await _trainerClientRepository.AddAsync(assignment, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return assignment.AssignmentId;
+    }
 }

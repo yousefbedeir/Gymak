@@ -15,4 +15,5 @@ public interface IUserService
 
     Task<Guid> AssignTrainerAsync(AssignTrainerRequest request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<TrainerClientDto>> GetTrainerClientsAsync(Guid trainerId, CancellationToken cancellationToken = default);
+    Task<Guid?> AutoAssignTrainerAsync(Guid memberId, CancellationToken cancellationToken = default);
 }

@@ -19,4 +19,5 @@ public interface ISubscriptionService
     Task<IReadOnlyList<SubscriptionDto>> GetSubscriptionsByUserAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<Guid> CreateSubscriptionAsync(CreateSubscriptionRequest request, CancellationToken cancellationToken = default);
     Task UpdateSubscriptionStatusAsync(Guid subscriptionId, SubscriptionStatus status, CancellationToken cancellationToken = default);
+    Task<Guid> ProcessPremiumUpgradeAsync(Guid userId, Guid planId, Domain.Enums.PaymentMethod paymentMethod, string? transactionRef, CancellationToken cancellationToken = default);
 }
