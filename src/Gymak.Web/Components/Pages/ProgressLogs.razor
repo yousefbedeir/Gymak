@@ -1,0 +1,293 @@
+@page "/progress-logs"
+@using Gymak.Application.Services
+@using Gymak.Application.DTOs
+@inject IProgressLogService ProgressLogService
+@inject IUserService UserService
+@rendermode InteractiveServer
+
+<PageTitle>Progress & Body Metrics - Gymak</PageTitle>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="bi bi-activity text-success me-2"></i>Progress & Body Metrics</h2>
+            <p class="text-muted mb-0">Track weight, BMI, body fat percentage, and body circumference measurements over time.</p>
+        </div>
+    </div>
+
+    <!-- Filter by User -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4">
+        <div class="card-body bg-light">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold mb-1">Select Member / User:</label>
+                    <select class="form-select" @onchange="OnUserSelected">
+                        <option value="">-- Select Member --</option>
+                        @foreach (var user in users)
+                        {
+                            <option value="@user.UserId">@user.FullName (@user.Email)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6 text-end pt-3 pt-md-0">
+                    @if (selectedUserId != Guid.Empty && latestLog != null)
+                    {
+                        <div class="d-flex justify-content-end gap-3">
+                            <div class="border-end pe-3 text-center">
+                                <small class="text-muted d-block">Latest Weight</small>
+                                <span class="fw-bold fs-5 text-primary">@latestLog.Weight kg</span>
+                            </div>
+                            <div class="border-end pe-3 text-center">
+                                <small class="text-muted d-block">BMI</small>
+                                <span class="fw-bold fs-5 text-dark">@latestLog.BMI</span>
+                            </div>
+                            <div class="text-center">
+                                <small class="text-muted d-block">Body Fat</small>
+                                <span class="fw-bold fs-5 text-success">@(latestLog.BodyFatPercentage.HasValue ? $"{latestLog.BodyFatPercentage}%" : "N/A")</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- New Log Form -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="card-title mb-0 fw-semibold"><i class="bi bi-plus-circle me-2"></i>Log Body Metrics</h5>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="logForm" OnValidSubmit="HandleLogProgress">
+                        <DataAnnotationsValidator />
+
+                        <div class="mb-3">
+                            <label class="form-label font-monospace small text-muted">Log Date</label>
+                            <InputDate class="form-control" @bind-Value="logForm.LogDate" required />
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label font-monospace small text-muted">Weight (kg)</label>
+                                <InputNumber class="form-control" @bind-Value="logForm.Weight" required step="0.1" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label font-monospace small text-muted">Height (cm)</label>
+                                <InputNumber class="form-control" @bind-Value="logForm.Height" required step="0.1" />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label font-monospace small text-muted">Body Fat %</label>
+                                <InputNumber class="form-control" @bind-Value="logForm.BodyFatPercentage" step="0.1" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label font-monospace small text-muted">Muscle Mass %</label>
+                                <InputNumber class="form-control" @bind-Value="logForm.MuscleMassPercentage" step="0.1" />
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold text-secondary border-bottom pb-2 mt-4 mb-3">Circumferences (cm)</h6>
+                        <div class="row g-2 mb-2">
+                            <div class="col-4">
+                                <label class="form-label font-monospace small text-muted">Chest</label>
+                                <InputNumber class="form-control" @bind-Value="logForm.ChestCm" step="0.5" />
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label font-monospace small text-muted">Waist</label>
+                                <InputNumber class="form-control" @bind-Value="logForm.WaistCm" step="0.5" />
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label font-monospace small text-muted">Hips</label>
+                                <InputNumber class="form-control" @bind-Value="logForm.HipsCm" step="0.5" />
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label class="form-label font-monospace small text-muted">Biceps</label>
+                                <InputNumber class="form-control" @bind-Value="logForm.BicepsCm" step="0.5" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label font-monospace small text-muted">Thighs</label>
+                                <InputNumber class="form-control" @bind-Value="logForm.ThighsCm" step="0.5" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label font-monospace small text-muted">Notes</label>
+                            <InputTextArea class="form-control" @bind-Value="logForm.Notes" rows="2" placeholder="e.g. Measured in morning before breakfast..." />
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 fw-bold py-2" disabled="@(selectedUserId == Guid.Empty)">
+                            Save Progress Log
+                        </button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Table -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0 fw-semibold">Body Measurement History</h5>
+                </div>
+                <div class="card-body">
+                    @if (isLoading)
+                    {
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-success" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    }
+                    else if (!logs.Any())
+                    {
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-journal-x fs-1 d-block mb-2"></i>
+                            <p>No progress logs recorded for the selected user yet.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Weight</th>
+                                        <th>Height</th>
+                                        <th>BMI</th>
+                                        <th>Body Fat %</th>
+                                        <th>Muscle %</th>
+                                        <th>Waist</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var log in logs)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@log.LogDate.ToString("MMM dd, yyyy")</td>
+                                            <td>@log.Weight kg</td>
+                                            <td>@log.Height cm</td>
+                                            <td><span class="badge bg-primary">@log.BMI</span></td>
+                                            <td>@(log.BodyFatPercentage.HasValue ? $"{log.BodyFatPercentage}%" : "-")</td>
+                                            <td>@(log.MuscleMassPercentage.HasValue ? $"{log.MuscleMassPercentage}%" : "-")</td>
+                                            <td>@(log.WaistCm.HasValue ? $"{log.WaistCm} cm" : "-")</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteLog(log.Id)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool isLoading = false;
+    private Guid selectedUserId = Guid.Empty;
+    private List<UserDto> users = new();
+    private List<ProgressLogDto> logs = new();
+    private ProgressLogDto? latestLog;
+
+    private ProgressLogFormModel logForm = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uList = await UserService.GetUsersByRoleAsync(Gymak.Domain.Enums.UserRole.Member);
+        users = uList.ToList();
+        if (users.Any())
+        {
+            selectedUserId = users.First().UserId;
+            await LoadUserLogsAsync();
+        }
+    }
+
+    private async Task OnUserSelected(ChangeEventArgs e)
+    {
+        if (Guid.TryParse(e.Value?.ToString(), out var userId))
+        {
+            selectedUserId = userId;
+            await LoadUserLogsAsync();
+        }
+        else
+        {
+            selectedUserId = Guid.Empty;
+            logs.Clear();
+            latestLog = null;
+        }
+    }
+
+    private async Task LoadUserLogsAsync()
+    {
+        if (selectedUserId == Guid.Empty) return;
+        isLoading = true;
+        try
+        {
+            var userLogs = await ProgressLogService.GetByUserIdAsync(selectedUserId);
+            logs = userLogs.ToList();
+            latestLog = await ProgressLogService.GetLatestByUserIdAsync(selectedUserId);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleLogProgress()
+    {
+        if (selectedUserId == Guid.Empty) return;
+
+        var request = new CreateProgressLogRequest(
+            selectedUserId,
+            logForm.LogDate,
+            logForm.Weight,
+            logForm.Height,
+            logForm.BodyFatPercentage,
+            logForm.MuscleMassPercentage,
+            logForm.ChestCm,
+            logForm.WaistCm,
+            logForm.HipsCm,
+            logForm.BicepsCm,
+            logForm.ThighsCm,
+            logForm.Notes
+        );
+
+        await ProgressLogService.LogProgressAsync(request);
+        logForm = new ProgressLogFormModel();
+        await LoadUserLogsAsync();
+    }
+
+    private async Task DeleteLog(Guid logId)
+    {
+        await ProgressLogService.DeleteProgressLogAsync(logId);
+        await LoadUserLogsAsync();
+    }
+
+    public class ProgressLogFormModel
+    {
+        public DateTime LogDate { get; set; } = DateTime.Today;
+        public decimal Weight { get; set; } = 75.0m;
+        public decimal Height { get; set; } = 175.0m;
+        public decimal? BodyFatPercentage { get; set; } = 18.5m;
+        public decimal? MuscleMassPercentage { get; set; } = 40.0m;
+        public decimal? ChestCm { get; set; }
+        public decimal? WaistCm { get; set; }
+        public decimal? HipsCm { get; set; }
+        public decimal? BicepsCm { get; set; }
+        public decimal? ThighsCm { get; set; }
+        public string? Notes { get; set; }
+    }
+}

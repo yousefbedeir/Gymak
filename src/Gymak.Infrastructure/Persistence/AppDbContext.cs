@@ -31,6 +31,14 @@ public class AppDbContext : DbContext, IApplicationDbContext
     public DbSet<DietPlan> DietPlans => Set<DietPlan>();
     public DbSet<MealItem> MealItems => Set<MealItem>();
 
+    // Module 4: Subscriptions & Financials
+    public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
+    public DbSet<Subscription> Subscriptions => Set<Subscription>();
+    public DbSet<Payment> Payments => Set<Payment>();
+
+    // Module 5: Progress & Body Metrics
+    public DbSet<ProgressLog> ProgressLogs => Set<ProgressLog>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

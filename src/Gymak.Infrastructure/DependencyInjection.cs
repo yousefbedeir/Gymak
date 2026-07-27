@@ -41,6 +41,14 @@ public static class DependencyInjection
         services.AddScoped<IFoodItemRepository, FoodItemRepository>();
         services.AddScoped<IDietPlanRepository, DietPlanRepository>();
 
+        // Module 4: Subscriptions & Financials
+        services.AddScoped<ISubscriptionPlanRepository, SubscriptionPlanRepository>();
+        services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
+
+        // Module 5: Progress & Body Metrics
+        services.AddScoped<IProgressLogRepository, ProgressLogRepository>();
+
         return services;
     }
 }

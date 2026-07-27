@@ -25,5 +25,13 @@ public interface IApplicationDbContext
     DbSet<DietPlan> DietPlans { get; }
     DbSet<MealItem> MealItems { get; }
 
+    // Module 4: Subscriptions & Financials
+    DbSet<SubscriptionPlan> SubscriptionPlans { get; }
+    DbSet<Subscription> Subscriptions { get; }
+    DbSet<Payment> Payments { get; }
+
+    // Module 5: Progress & Body Metrics
+    DbSet<ProgressLog> ProgressLogs { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
