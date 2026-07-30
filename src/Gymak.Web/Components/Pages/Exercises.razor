@@ -1,0 +1,317 @@
+@page "/exercises"
+@page "/workouts"
+@using Gymak.Application.DTOs
+@using Gymak.Application.Services
+@using Gymak.Domain.Enums
+@inject IWorkoutService WorkoutService
+@rendermode InteractiveServer
+
+<PageTitle>Exercises & Workout Systems — Gymak OS</PageTitle>
+
+<div class="py-2 anim-fade">
+    <!-- ─── Header ─── -->
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4 anim-fade-up">
+        <div>
+            <h3 class="fw-bold text-white mb-1" style="font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 1.5px;">
+                WORKOUT SYSTEMS & EXERCISES
+            </h3>
+            <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">
+                مكتبة التمارين الرياضية مقسّمة حسب العضلات، مع شرح كامل لأفضل أنظمة التدريب المشهورة
+            </p>
+        </div>
+    </div>
+
+    <!-- ─── Main Tabs ─── -->
+    <div class="d-flex mb-4 anim-fade-up-d1" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+        <button class="px-4 py-3 border-0 fw-bold me-2"
+                style="background: transparent; font-size: 0.9rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;
+                       color: @(activeTab == "library" ? "#f5c518" : "#6b7280");
+                       border-bottom: @(activeTab == "library" ? "2px solid #f5c518" : "2px solid transparent") !important;"
+                @onclick='() => activeTab = "library"'>
+            <i class="bi bi-grid-3x3-gap-fill me-2"></i>مكتبة التمارين حسب العضلة
+        </button>
+        <button class="px-4 py-3 border-0 fw-bold me-2"
+                style="background: transparent; font-size: 0.9rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;
+                       color: @(activeTab == "systems" ? "#f5c518" : "#6b7280");
+                       border-bottom: @(activeTab == "systems" ? "2px solid #f5c518" : "2px solid transparent") !important;"
+                @onclick='() => activeTab = "systems"'>
+            <i class="bi bi-diagram-3-fill me-2"></i>أنظمة التمارين وشرحها (Workout Splits)
+        </button>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5" style="color: #6b7280;">
+            <div class="spinner-border spinner-border-sm me-2" style="color: #f5c518;"></div>
+            جاري تحميل التمارين والأنظمة...
+        </div>
+    }
+    else
+    {
+        <!-- ═══════════════════════════════════════════════════════════
+             TAB 1: EXERCISE LIBRARY BY MUSCLE GROUP
+             ═══════════════════════════════════════════════════════════ -->
+        if (activeTab == "library")
+        {
+            <!-- Muscle Filter Bar -->
+            <div class="p-3 rounded mb-4 anim-fade-up-d2" style="background: #111111; border: 1px solid rgba(255,255,255,0.07);">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-2 overflow-auto py-1 flex-grow-1" style="white-space: nowrap;">
+                        <button class="btn btn-sm fw-bold px-3 py-1.5 rounded"
+                                style="font-size: 0.8rem; background: @(selectedMuscleGroupId == null ? "#f5c518" : "#181818");
+                                       color: @(selectedMuscleGroupId == null ? "#000" : "#9ca3af"); border: 1px solid rgba(255,255,255,0.08);"
+                                @onclick="() => FilterByMuscleGroup(null)">
+                            🔥 كل العضلات (@allExercises.Count)
+                        </button>
+                        @foreach (var group in muscleGroups)
+                        {
+                            var count = allExercises.Count(e => e.MuscleGroupId == group.MuscleGroupId);
+                            <button class="btn btn-sm fw-bold px-3 py-1.5 rounded"
+                                    style="font-size: 0.8rem; background: @(selectedMuscleGroupId == group.MuscleGroupId ? "#f5c518" : "#181818");
+                                           color: @(selectedMuscleGroupId == group.MuscleGroupId ? "#000" : "#9ca3af"); border: 1px solid rgba(255,255,255,0.08);"
+                                    @onclick="() => FilterByMuscleGroup(group.MuscleGroupId)">
+                                @group.Name (@count)
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Search Input -->
+                <div class="d-flex align-items-center rounded"
+                     style="background: #181818; border: 1px solid rgba(255,255,255,0.08); overflow: hidden;">
+                    <span class="px-3" style="color: #6b7280;"><i class="bi bi-search"></i></span>
+                    <input type="text" class="flex-grow-1 border-0 bg-transparent text-white py-2 pe-3"
+                           style="outline: none; font-size: 0.88rem;" placeholder="ابحث باسم التمرين أو نوع العضلة..."
+                           @bind="searchTerm" @bind:event="oninput" />
+                </div>
+            </div>
+
+            <!-- Exercises Cards Grid -->
+            @if (!FilteredExercises.Any())
+            {
+                <div class="text-center py-5" style="color: #6b7280;">
+                    <i class="bi bi-card-checklist d-block mb-2" style="font-size: 2.5rem; color: #1f2937;"></i>
+                    لا توجد تمارين تطابق هذا البحث حالياً.
+                </div>
+            }
+            else
+            {
+                <div class="row g-3 anim-fade-up-d3">
+                    @foreach (var exercise in FilteredExercises)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="p-4 rounded h-100 d-flex flex-column hover-lift"
+                                 style="background: #111111; border: 1px solid rgba(255,255,255,0.07); transition: all 0.25s;"
+                                 onmouseover="this.style.borderColor='rgba(245,197,24,0.35)'; this.style.boxShadow='0 8px 24px rgba(245,197,24,0.08)'"
+                                 onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'; this.style.boxShadow='none'">
+                                
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <span class="badge-gold px-2 py-1">@exercise.MuscleGroupName</span>
+                                    <span class="px-2 py-1 rounded fw-bold"
+                                          style="font-size: 0.72rem; background: @(exercise.ExerciseType == ExerciseType.Strength ? "rgba(59,130,246,0.15)" : "rgba(34,197,94,0.15)");
+                                                 color: @(exercise.ExerciseType == ExerciseType.Strength ? "#3b82f6" : "#22c55e");">
+                                        @(exercise.ExerciseType == ExerciseType.Strength ? "مقاومة / أوزان" : "كارديو")
+                                    </span>
+                                </div>
+
+                                <h5 class="fw-bold text-white mb-2" style="font-size: 1.05rem;">@exercise.Name</h5>
+                                <p class="small flex-grow-1 mb-3" style="color: #9ca3af; font-size: 0.85rem; line-height: 1.5;">
+                                    @(exercise.Description ?? "تمرين أساسي وممتاز لاستهداف وتنشيط الألياف العضلية.")
+                                </p>
+
+                                <div class="d-flex align-items-center justify-content-between pt-3"
+                                     style="border-top: 1px solid rgba(255,255,255,0.06);">
+                                    <span style="color: #6b7280; font-size: 0.78rem;">
+                                        <i class="bi bi-lightning-charge-fill me-1" style="color: #f5c518;"></i>أداء مثالي
+                                    </span>
+                                    <a href="progress-logs" class="btn btn-sm fw-bold rounded px-3"
+                                       style="background: rgba(245,197,24,0.12); color: #f5c518; border: 1px solid rgba(245,197,24,0.3); font-size: 0.78rem;">
+                                        سجّل تمرينك →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        }
+
+        <!-- ═══════════════════════════════════════════════════════════
+             TAB 2: WORKOUT SYSTEMS & SPLITS GUIDE
+             ═══════════════════════════════════════════════════════════ -->
+        if (activeTab == "systems")
+        {
+            <div class="row g-4 anim-fade-up-d2">
+                <!-- System 1: Push Pull Legs -->
+                <div class="col-lg-6">
+                    <div class="p-4 rounded h-100" style="background: #111111; border: 1px solid rgba(245,197,24,0.25);">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge-gold px-3 py-1 fs-7">نظام 3-6 أيام أسبوعياً</span>
+                            <span class="px-2 py-1 rounded fw-bold text-uppercase" style="background: rgba(34,197,94,0.15); color: #22c55e; font-size: 0.72rem;">الأكثر شعبية للبناء العضلي</span>
+                        </div>
+
+                        <h4 class="fw-bold text-white mb-2" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 1px; color: #f5c518;">
+                            PUSH - PULL - LEGS (PPL)
+                        </h4>
+                        <p style="color: #9ca3af; font-size: 0.88rem; line-height: 1.6;" class="mb-4">
+                            يعتبر نظام الـ PPL من أقوى وأنجح أنظمة التمارين عالمياً، حيث يقسم الجسم بناءً على حركة العضلات المشتركة لضمان أقصى تضخيم واستشفاء عضلي.
+                        </p>
+
+                        <div class="d-flex flex-column gap-3 mb-4">
+                            <div class="p-3 rounded" style="background: #181818; border: 1px solid rgba(255,255,255,0.06);">
+                                <div class="fw-bold text-white mb-1" style="font-size: 0.9rem; color: #f5c518 !important;">
+                                    💥 يوم الدفع (Push Day):
+                                </div>
+                                <div style="color: #6b7280; font-size: 0.82rem;">استهداف الصدر + الأكتاف الأمامية والجانبية + الترايسپس</div>
+                            </div>
+                            <div class="p-3 rounded" style="background: #181818; border: 1px solid rgba(255,255,255,0.06);">
+                                <div class="fw-bold text-white mb-1" style="font-size: 0.9rem; color: #3b82f6 !important;">
+                                    💥 يوم السحب (Pull Day):
+                                </div>
+                                <div style="color: #6b7280; font-size: 0.82rem;">استهداف الظهر كامل + البايسپس + الأكتاف الخلفية</div>
+                            </div>
+                            <div class="p-3 rounded" style="background: #181818; border: 1px solid rgba(255,255,255,0.06);">
+                                <div class="fw-bold text-white mb-1" style="font-size: 0.9rem; color: #22c55e !important;">
+                                    💥 يوم الأرجل (Legs Day):
+                                </div>
+                                <div style="color: #6b7280; font-size: 0.82rem;">استهداف الفخذ الأمامي والخلفي + السمانة وعضلات البطن</div>
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded d-flex align-items-center justify-content-between" style="background: rgba(245,197,24,0.06); border: 1px solid rgba(245,197,24,0.2);">
+                            <span style="color: #f5c518; font-size: 0.82rem; font-weight: 600;">مناسب للمستوى: متوسط إلى متقدم</span>
+                            <a href="coaches" class="btn btn-sm fw-bold rounded px-3" style="background: #f5c518; color: #000; font-size: 0.78rem;">اطلب جدول PPL خاص ←</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System 2: Upper / Lower Split -->
+                <div class="col-lg-6">
+                    <div class="p-4 rounded h-100" style="background: #111111; border: 1px solid rgba(255,255,255,0.08);">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge-gold px-3 py-1 fs-7">نظام 4 أيام أسبوعياً</span>
+                            <span class="px-2 py-1 rounded fw-bold text-uppercase" style="background: rgba(59,130,246,0.15); color: #3b82f6; font-size: 0.72rem;">مثالي للقوة والتوازن</span>
+                        </div>
+
+                        <h4 class="fw-bold text-white mb-2" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 1px; color: #3b82f6;">
+                            UPPER / LOWER SPLIT
+                        </h4>
+                        <p style="color: #9ca3af; font-size: 0.88rem; line-height: 1.6;" class="mb-4">
+                            يقسم التمارين إلى يومين للجزء العلوي ويومين للجزء السفلي، مما يوفر تكرار تمرين العضلة مرتين في الأسبوع مع أيام استشفاء كافية.
+                        </p>
+
+                        <div class="d-flex flex-column gap-3 mb-4">
+                            <div class="p-3 rounded" style="background: #181818; border: 1px solid rgba(255,255,255,0.06);">
+                                <div class="fw-bold text-white mb-1" style="font-size: 0.9rem;">
+                                    🏋️ Upper Body (الجزء العلوي):
+                                </div>
+                                <div style="color: #6b7280; font-size: 0.82rem;">صدر + ظهر + أكتاف + باي + تراي برتم مكثف وتكرارات متوازنة</div>
+                            </div>
+                            <div class="p-3 rounded" style="background: #181818; border: 1px solid rgba(255,255,255,0.06);">
+                                <div class="fw-bold text-white mb-1" style="font-size: 0.9rem;">
+                                    🦵 Lower Body (الجزء السفلي):
+                                </div>
+                                <div style="color: #6b7280; font-size: 0.82rem;">سكوات + ديدليفت روماني + مكواة أرجل + بطن وجذع</div>
+                            </div>
+                        </div>
+
+                        <div class="p-3 rounded d-flex align-items-center justify-content-between" style="background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.2);">
+                            <span style="color: #3b82f6; font-size: 0.82rem; font-weight: 600;">مناسب للمستوى: مبتدئ ومتوسط</span>
+                            <a href="coaches" class="btn btn-sm fw-bold rounded px-3" style="background: #3b82f6; color: #fff; font-size: 0.78rem;">اطلب جدول Upper/Lower ←</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System 3: Full Body -->
+                <div class="col-lg-6">
+                    <div class="p-4 rounded h-100" style="background: #111111; border: 1px solid rgba(255,255,255,0.08);">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge-gold px-3 py-1 fs-7">نظام 3 أيام أسبوعياً</span>
+                            <span class="px-2 py-1 rounded fw-bold text-uppercase" style="background: rgba(245,158,11,0.15); color: #f59e0b; font-size: 0.72rem;">أفضل اختيار للمبتدئين</span>
+                        </div>
+
+                        <h4 class="fw-bold text-white mb-2" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 1px; color: #f59e0b;">
+                            FULL BODY SPLIT
+                        </h4>
+                        <p style="color: #9ca3af; font-size: 0.88rem; line-height: 1.6;" class="mb-4">
+                            تمرن كامل عضلات الجسم الرئيسية في كل حصة تدريبية (مثل السبت، الاثنين، الأربعاء)، مما يساعد على زيادة معدل الحرق وتنشيط بناء العضلات.
+                        </p>
+
+                        <div class="p-3 rounded mb-4" style="background: #181818; border: 1px solid rgba(255,255,255,0.06);">
+                            <div class="fw-bold text-white mb-1" style="font-size: 0.9rem;">
+                                ⚡ المميزات والفوائد:
+                            </div>
+                            <div style="color: #6b7280; font-size: 0.82rem;">مرونة عالية للجدول المزدحم، حرق سعرات عالي، وتجهيز العضلات والأوتار للتطور.</div>
+                        </div>
+
+                        <div class="p-3 rounded d-flex align-items-center justify-content-between" style="background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2);">
+                            <span style="color: #f59e0b; font-size: 0.82rem; font-weight: 600;">مناسب للمبتدئين وأصحاب الأوقات الضيقة</span>
+                            <a href="coaches" class="btn btn-sm fw-bold rounded px-3" style="background: #f59e0b; color: #000; font-size: 0.78rem;">جدول Full Body ←</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System 4: Bro Split -->
+                <div class="col-lg-6">
+                    <div class="p-4 rounded h-100" style="background: #111111; border: 1px solid rgba(255,255,255,0.08);">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge-gold px-3 py-1 fs-7">نظام 5 أيام أسبوعياً</span>
+                            <span class="px-2 py-1 rounded fw-bold text-uppercase" style="background: rgba(139,92,246,0.15); color: #8b5cf6; font-size: 0.72rem;">ضخ دم وشكل كلاسيكي</span>
+                        </div>
+
+                        <h4 class="fw-bold text-white mb-2" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: 1px; color: #8b5cf6;">
+                            SINGLE MUSCLE (BRO SPLIT)
+                        </h4>
+                        <p style="color: #9ca3af; font-size: 0.88rem; line-height: 1.6;" class="mb-4">
+                            النظام الكلاسيكي المستهدف: تخصيص يوم كامل لعضلة واحدة (يوم الصدر، يوم الظهر، يوم الأكتاف، يوم الذراع، يوم الأرجل).
+                        </p>
+
+                        <div class="p-3 rounded mb-4" style="background: #181818; border: 1px solid rgba(255,255,255,0.06);">
+                            <div class="fw-bold text-white mb-1" style="font-size: 0.9rem;">
+                                🎯 التركيز الشديد:
+                            </div>
+                            <div style="color: #6b7280; font-size: 0.82rem;">يتيح لك إعطاء 4-5 تمارين للعضلة الواحدة وزيادة ضخ الدم (Pump) والتركيز التام.</div>
+                        </div>
+
+                        <div class="p-3 rounded d-flex align-items-center justify-content-between" style="background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.2);">
+                            <span style="color: #8b5cf6; font-size: 0.82rem; font-weight: 600;">مناسب للمحترفين وهواة ضخ الدم</span>
+                            <a href="coaches" class="btn btn-sm fw-bold rounded px-3" style="background: #8b5cf6; color: #fff; font-size: 0.78rem;">جدول Bro Split ←</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private string activeTab = "library";
+    private bool isLoading = true;
+    private Guid? selectedMuscleGroupId;
+    private string searchTerm = string.Empty;
+
+    private List<MuscleGroupDto> muscleGroups = new();
+    private List<ExerciseDto> allExercises = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            muscleGroups = (await WorkoutService.GetMuscleGroupsAsync()).ToList();
+            allExercises = (await WorkoutService.GetAllExercisesAsync()).ToList();
+        }
+        finally { isLoading = false; }
+    }
+
+    private void FilterByMuscleGroup(Guid? id)
+    {
+        selectedMuscleGroupId = id;
+    }
+
+    private List<ExerciseDto> FilteredExercises => allExercises.Where(e =>
+        (selectedMuscleGroupId == null || e.MuscleGroupId == selectedMuscleGroupId) &&
+        (string.IsNullOrWhiteSpace(searchTerm) ||
+         e.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+         (e.Description != null && e.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)))
+    ).ToList();
+}

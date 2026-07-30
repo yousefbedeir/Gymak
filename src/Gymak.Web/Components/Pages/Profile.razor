@@ -10,57 +10,57 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 
-<PageTitle>My Profile — Gymak Fitness OS</PageTitle>
+<PageTitle>My Profile - GYMAK</PageTitle>
 
-<div class="py-2">
+<div class="py-2 anim-fade">
 
     <!-- ─── Profile Header ─── -->
-    <div class="p-4 p-md-5 rounded mb-4 d-flex flex-column flex-md-row align-items-center justify-content-between gap-4"
-         style="background: linear-gradient(135deg, #1a2a5e 0%, #0d1a40 50%, #111 100%); border: 1px solid rgba(30,90,220,0.3);">
+    <div class="p-4 p-md-5 rounded mb-4 d-flex flex-column flex-md-row align-items-center justify-content-between gap-4 anim-fade-up"
+         style="background: linear-gradient(135deg, #181818 0%, #111111 100%); border: 1px solid rgba(245,197,24,0.25); box-shadow: 0 8px 30px rgba(0,0,0,0.5);">
         <div class="d-flex align-items-center gap-4">
-            <div class="d-flex align-items-center justify-content-center fw-bold text-white rounded"
-                 style="width: 72px; height: 72px; background: #1e5adc; font-size: 1.6rem; flex-shrink: 0;">
+            <div class="d-flex align-items-center justify-content-center fw-bold text-black rounded"
+                 style="width: 72px; height: 72px; background: #f5c518; font-size: 1.6rem; flex-shrink: 0; box-shadow: 0 4px 20px rgba(245,197,24,0.25);">
                 @GetInitials(userDto?.FullName)
             </div>
             <div>
                 <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-                    <h3 class="fw-bold text-white mb-0" style="letter-spacing: -0.5px;">@(userDto?.FullName ?? "User Profile")</h3>
+                    <h3 class="fw-bold text-white mb-0" style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 1px;">@(userDto?.FullName ?? "User Profile")</h3>
                     <span class="px-2 py-1 rounded fw-600" style="font-size: 0.75rem; @GetRoleStyle(userDto?.Role)">@(userDto?.Role.ToString() ?? "User")</span>
                     @if (userDto?.IsPremium == true)
                     {
-                        <span class="px-2 py-1 rounded fw-600" style="font-size: 0.75rem; background: rgba(245,158,11,0.15); color: #f59e0b;">
-                            <i class="bi bi-star-fill me-1"></i>VIP
+                        <span class="px-2 py-1 rounded fw-600" style="font-size: 0.75rem; background: rgba(245,197,24,0.15); color: #f5c518; border: 1px solid rgba(245,197,24,0.3);">
+                            <i class="bi bi-star-fill me-1"></i>VIP MEMBER
                         </span>
                     }
                 </div>
                 <p class="mb-0" style="color: #6b7280; font-size: 0.88rem;">
-                    <i class="bi bi-envelope me-1"></i>@(userDto?.Email)
+                    <i class="bi bi-envelope me-1" style="color: #f5c518;"></i>@(userDto?.Email)
                 </p>
             </div>
         </div>
-        <a href="subscriptions" class="btn rounded d-flex align-items-center gap-2"
-           style="background: rgba(30,90,220,0.2); border: 1px solid rgba(30,90,220,0.4); color: #3b7ff5; font-size: 0.85rem; white-space: nowrap;">
+        <a href="subscriptions" class="btn rounded d-flex align-items-center gap-2 fw-bold"
+           style="background: rgba(245,197,24,0.15); border: 1px solid rgba(245,197,24,0.4); color: #f5c518; font-size: 0.85rem; white-space: nowrap; letter-spacing: 0.5px; text-transform: uppercase;">
             <i class="bi bi-credit-card-fill"></i> Subscription Plans
         </a>
     </div>
 
     <div class="row g-4">
         <!-- ─── Main Form ─── -->
-        <div class="col-lg-8">
-            <div class="rounded overflow-hidden" style="background: #1a1a1a; border: 1px solid rgba(255,255,255,0.07);">
+        <div class="col-lg-8 anim-fade-up-d1">
+            <div class="rounded overflow-hidden" style="background: #111111; border: 1px solid rgba(255,255,255,0.07);">
                 <!-- Tab Bar -->
                 <div class="d-flex" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
                     <button class="px-4 py-3 border-0 fw-semibold"
                             style="background: transparent; font-size: 0.88rem; cursor: pointer;
-                                   color: @(activeTab == "details" ? "#fff" : "#6b7280");
-                                   border-bottom: @(activeTab == "details" ? "2px solid #1e5adc" : "2px solid transparent") !important;"
+                                   color: @(activeTab == "details" ? "#f5c518" : "#6b7280");
+                                   border-bottom: @(activeTab == "details" ? "2px solid #f5c518" : "2px solid transparent") !important;"
                             @onclick='() => activeTab = "details"'>
                         <i class="bi bi-person-badge me-2"></i>Personal Details
                     </button>
                     <button class="px-4 py-3 border-0 fw-semibold"
                             style="background: transparent; font-size: 0.88rem; cursor: pointer;
-                                   color: @(activeTab == "security" ? "#fff" : "#6b7280");
-                                   border-bottom: @(activeTab == "security" ? "2px solid #1e5adc" : "2px solid transparent") !important;"
+                                   color: @(activeTab == "security" ? "#f5c518" : "#6b7280");
+                                   border-bottom: @(activeTab == "security" ? "2px solid #f5c518" : "2px solid transparent") !important;"
                             @onclick='() => activeTab = "security"'>
                         <i class="bi bi-shield-lock me-2"></i>Security & Password
                     </button>
@@ -78,31 +78,31 @@
                         }
 
                         <EditForm Model="profileInput" OnValidSubmit="HandleSaveProfile">
-                            <p class="mb-3 fw-600 text-uppercase" style="font-size: 0.7rem; letter-spacing: 2px; color: #374151;">Account Overview</p>
+                            <p class="mb-3 fw-700 text-uppercase" style="font-size: 0.72rem; letter-spacing: 2px; color: #f5c518;">Account Overview</p>
 
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Full Name</label>
                                     <input type="text" class="w-100 rounded py-2 px-3 text-white"
-                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none; color: #9ca3af !important;"
+                                           style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none; color: #9ca3af !important;"
                                            @bind="profileInput.FullName" readonly />
                                 </div>
                                 <div class="col-md-6">
                                     <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Email Address</label>
                                     <input type="email" class="w-100 rounded py-2 px-3"
-                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none; color: #9ca3af !important;"
+                                           style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none; color: #9ca3af !important;"
                                            @bind="profileInput.Email" readonly />
                                 </div>
                                 <div class="col-md-6">
                                     <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Phone Number</label>
                                     <input type="text" class="w-100 rounded py-2 px-3 text-white"
-                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                           style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
                                            @bind="profileInput.PhoneNumber" placeholder="Add phone number..." />
                                 </div>
                                 <div class="col-md-6">
                                     <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Role</label>
                                     <input type="text" class="w-100 rounded py-2 px-3"
-                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none; color: #9ca3af !important;"
+                                           style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none; color: #9ca3af !important;"
                                            value="@(userDto?.Role.ToString())" readonly />
                                 </div>
                             </div>
@@ -110,25 +110,25 @@
                             @if (memberProfileDto != null || userDto?.Role == UserRole.Member)
                             {
                                 <div style="border-top: 1px solid rgba(255,255,255,0.07);" class="pt-4 mt-2"></div>
-                                <p class="mb-3 fw-600 text-uppercase" style="font-size: 0.7rem; letter-spacing: 2px; color: #374151;">Fitness Profile & Body Metrics</p>
+                                <p class="mb-3 fw-700 text-uppercase" style="font-size: 0.72rem; letter-spacing: 2px; color: #f5c518;">Fitness Profile & Body Metrics</p>
 
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-4">
                                         <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Height (cm)</label>
                                         <input type="number" step="0.1" class="w-100 rounded py-2 px-3 text-white"
-                                               style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                               style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
                                                @bind="profileInput.Height" placeholder="175" />
                                     </div>
                                     <div class="col-md-4">
                                         <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Current Weight (kg)</label>
                                         <input type="number" step="0.1" class="w-100 rounded py-2 px-3 text-white"
-                                               style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                               style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
                                                @bind="profileInput.CurrentWeight" placeholder="70" />
                                     </div>
                                     <div class="col-md-4">
                                         <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Gender</label>
                                         <select class="w-100 rounded py-2 px-3 text-white"
-                                                style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                                style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
                                                 @bind="profileInput.Gender">
                                             <option value="">Select Gender</option>
                                             <option value="Male">Male</option>
@@ -138,7 +138,7 @@
                                     <div class="col-12">
                                         <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Fitness Goal</label>
                                         <input type="text" class="w-100 rounded py-2 px-3 text-white"
-                                               style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                               style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
                                                @bind="profileInput.FitnessGoal" placeholder="e.g. Muscle Gain, Weight Loss..." />
                                     </div>
                                 </div>
@@ -146,7 +146,7 @@
 
                             <div class="d-flex justify-content-end">
                                 <button type="submit" class="btn rounded fw-bold px-4 py-2 d-flex align-items-center gap-2"
-                                        style="background: #1e5adc; color: white; border: none; font-size: 0.88rem;"
+                                        style="background: #f5c518; color: #000; border: none; font-size: 0.88rem; letter-spacing: 0.5px; text-transform: uppercase;"
                                         disabled="@isSavingProfile">
                                     @if (isSavingProfile)
                                     {
@@ -178,31 +178,31 @@
                         }
 
                         <EditForm Model="changePasswordInput" OnValidSubmit="HandleChangePassword">
-                            <p class="mb-3 fw-600 text-uppercase" style="font-size: 0.7rem; letter-spacing: 2px; color: #374151;">Change Password</p>
+                            <p class="mb-3 fw-700 text-uppercase" style="font-size: 0.72rem; letter-spacing: 2px; color: #f5c518;">Change Password</p>
 
                             <div class="mb-3">
                                 <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Current Password</label>
                                 <input type="password" class="w-100 rounded py-2 px-3 text-white"
-                                       style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                       style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
                                        @bind="changePasswordInput.CurrentPassword" placeholder="••••••••" required />
                             </div>
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">New Password</label>
                                     <input type="password" class="w-100 rounded py-2 px-3 text-white"
-                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                           style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
                                            @bind="changePasswordInput.NewPassword" placeholder="••••••••" required />
                                 </div>
                                 <div class="col-md-6">
                                     <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem;">Confirm New Password</label>
                                     <input type="password" class="w-100 rounded py-2 px-3 text-white"
-                                           style="background: #111; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
+                                           style="background: #181818; border: 1px solid rgba(255,255,255,0.08); font-size: 0.88rem; outline: none;"
                                            @bind="changePasswordInput.ConfirmNewPassword" placeholder="••••••••" required />
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end">
                                 <button type="submit" class="btn rounded fw-bold px-4 py-2 d-flex align-items-center gap-2"
-                                        style="background: #f59e0b; color: #111; border: none; font-size: 0.88rem;"
+                                        style="background: #f5c518; color: #000; border: none; font-size: 0.88rem; letter-spacing: 0.5px; text-transform: uppercase;"
                                         disabled="@isChangingPassword">
                                     @if (isChangingPassword)
                                     {
@@ -221,9 +221,9 @@
         </div>
 
         <!-- ─── Sidebar ─── -->
-        <div class="col-lg-4">
-            <div class="rounded p-4" style="background: #1a1a1a; border: 1px solid rgba(255,255,255,0.07);">
-                <p class="mb-3 fw-600 text-uppercase" style="font-size: 0.7rem; letter-spacing: 2px; color: #374151;">Account Status</p>
+        <div class="col-lg-4 anim-fade-up-d2">
+            <div class="rounded p-4" style="background: #111111; border: 1px solid rgba(255,255,255,0.07);">
+                <p class="mb-3 fw-700 text-uppercase" style="font-size: 0.72rem; letter-spacing: 2px; color: #f5c518;">Account Status</p>
                 <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
                     <span style="color: #6b7280; font-size: 0.85rem;">Status</span>
                     <span class="px-2 py-1 rounded" style="background: rgba(34,197,94,0.15); color: #22c55e; font-size: 0.75rem; font-weight: 600;">Active</span>
@@ -232,11 +232,11 @@
                     <span style="color: #6b7280; font-size: 0.85rem;">Role Tier</span>
                     <span class="fw-semibold text-white" style="font-size: 0.88rem;">@(userDto?.Role.ToString())</span>
                 </div>
-                <div class="d-flex align-items-center justify-content-between py-2" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+                <div class="d-flex align-items-center justify-content-between py-2">
                     <span style="color: #6b7280; font-size: 0.85rem;">Membership</span>
                     @if (userDto?.IsPremium == true)
                     {
-                        <span style="color: #f59e0b; font-size: 0.85rem; font-weight: 600;"><i class="bi bi-check-circle-fill me-1"></i>VIP Active</span>
+                        <span style="color: #f5c518; font-size: 0.85rem; font-weight: 600;"><i class="bi bi-star-fill me-1"></i>VIP Active</span>
                     }
                     else
                     {
@@ -247,18 +247,18 @@
                 @if (memberProfileDto != null)
                 {
                     <div class="mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.07);">
-                        <p class="mb-3 fw-600 text-uppercase" style="font-size: 0.7rem; letter-spacing: 2px; color: #374151;">Body Stats</p>
+                        <p class="mb-3 fw-700 text-uppercase" style="font-size: 0.72rem; letter-spacing: 2px; color: #f5c518;">Body Stats</p>
                         <div class="row g-2">
                             <div class="col-6">
-                                <div class="p-2 rounded text-center" style="background: #111; border: 1px solid rgba(255,255,255,0.07);">
-                                    <div class="fw-bold text-white" style="font-size: 1.1rem;">@memberProfileDto.Height</div>
-                                    <div style="color: #6b7280; font-size: 0.7rem;">Height cm</div>
+                                <div class="p-2 rounded text-center" style="background: #181818; border: 1px solid rgba(255,255,255,0.07);">
+                                    <div class="fw-bold text-white font-monospace" style="font-size: 1.2rem;">@memberProfileDto.Height</div>
+                                    <div style="color: #6b7280; font-size: 0.7rem;">Height (cm)</div>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="p-2 rounded text-center" style="background: #111; border: 1px solid rgba(255,255,255,0.07);">
-                                    <div class="fw-bold text-white" style="font-size: 1.1rem;">@memberProfileDto.CurrentWeight</div>
-                                    <div style="color: #6b7280; font-size: 0.7rem;">Weight kg</div>
+                                <div class="p-2 rounded text-center" style="background: #181818; border: 1px solid rgba(255,255,255,0.07);">
+                                    <div class="fw-bold text-white font-monospace" style="font-size: 1.2rem;">@memberProfileDto.CurrentWeight</div>
+                                    <div style="color: #6b7280; font-size: 0.7rem;">Weight (kg)</div>
                                 </div>
                             </div>
                         </div>
@@ -315,7 +315,6 @@
                 {
                     profileInput.FullName = userDto.FullName;
                     profileInput.Email = userDto.Email;
-                    // PhoneNumber loaded from member profile if available
                     memberProfileDto = await UserService.GetProfileByUserIdAsync(userDto.UserId);
                     if (memberProfileDto != null)
                     {

@@ -1,0 +1,334 @@
+@page "/nutrition"
+@using Gymak.Application.DTOs
+@using Gymak.Application.Services
+@inject INutritionService NutritionService
+@rendermode InteractiveServer
+
+<PageTitle>Nutrition & Diet Plans - GYMAK</PageTitle>
+
+<div class="py-2 anim-fade">
+    <!-- ─── Header ─── -->
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4 anim-fade-up">
+        <div>
+            <h3 class="fw-bold text-white mb-1" style="font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 1.5px;">
+                NUTRITION & DIET PLANS
+            </h3>
+            <p style="color: #6b7280; font-size: 0.85rem; margin: 0;">
+                الأنظمة الغذائية الكاملة لتضخيم وتنشيف وتنسيق الجسم مع شرح القيم الغذائية
+            </p>
+        </div>
+        <a href="coaches" class="btn fw-bold rounded px-4 py-2 d-flex align-items-center gap-2"
+           style="background: #f5c518; color: #000; border: none; font-size: 0.85rem; letter-spacing: 0.5px; text-transform: uppercase;">
+            <i class="bi bi-person-check-fill"></i> طلب نظام مخصص مع كوتش خاص
+        </a>
+    </div>
+
+    <!-- ─── Custom Paid Plan Banner ─── -->
+    <div class="p-4 rounded mb-4 anim-fade-up-d1 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3"
+         style="background: linear-gradient(135deg, #1f1b0a 0%, #111111 100%); border: 1px solid rgba(245,197,24,0.3); box-shadow: 0 8px 30px rgba(0,0,0,0.4);">
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center justify-content-center rounded flex-shrink-0"
+                 style="width: 52px; height: 52px; background: rgba(245,197,24,0.15); color: #f5c518; border: 1px solid rgba(245,197,24,0.3);">
+                <i class="bi bi-star-fill fs-3"></i>
+            </div>
+            <div>
+                <h5 class="fw-bold text-white mb-1" style="font-size: 1.1rem; color: #f5c518 !important;">
+                    هل تحتاج إلى نظام غذائي مخصص 100% لجسمك؟ (خدمة مدفوعة)
+                </h5>
+                <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                    سيقوم الكوتش الخاص بحساب سعراتك الحرارية، الماكروز (البروتين، الكارب، الدهون) وتصميم وجبات تناسب أسلوب حياتك وأكلاتك المفضلة.
+                </p>
+            </div>
+        </div>
+        <a href="coaches" class="btn fw-bold rounded px-4 py-2 text-nowrap"
+           style="background: #f5c518; color: #000; border: none; font-size: 0.85rem; letter-spacing: 0.5px;">
+            اشتراك الكوتش الخاص ←
+        </a>
+    </div>
+
+    <!-- ─── Plan Selector Tabs ─── -->
+    <div class="d-flex mb-4 anim-fade-up-d2" style="border-bottom: 1px solid rgba(255,255,255,0.07);">
+        <button class="px-4 py-3 border-0 fw-bold me-2"
+                style="background: transparent; font-size: 0.9rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;
+                       color: @(selectedGoal == "bulking" ? "#f5c518" : "#6b7280");
+                       border-bottom: @(selectedGoal == "bulking" ? "2px solid #f5c518" : "2px solid transparent") !important;"
+                @onclick='() => selectedGoal = "bulking"'>
+            💪 خطة التضخيم (Bulking - بناء العضلات)
+        </button>
+        <button class="px-4 py-3 border-0 fw-bold me-2"
+                style="background: transparent; font-size: 0.9rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;
+                       color: @(selectedGoal == "cutting" ? "#ef4444" : "#6b7280");
+                       border-bottom: @(selectedGoal == "cutting" ? "2px solid #ef4444" : "2px solid transparent") !important;"
+                @onclick='() => selectedGoal = "cutting"'>
+            🔥 خطة التنشيف (Cutting - حرق الدهون)
+        </button>
+        <button class="px-4 py-3 border-0 fw-bold me-2"
+                style="background: transparent; font-size: 0.9rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;
+                       color: @(selectedGoal == "maintenance" ? "#22c55e" : "#6b7280");
+                       border-bottom: @(selectedGoal == "maintenance" ? "2px solid #22c55e" : "2px solid transparent") !important;"
+                @onclick='() => selectedGoal = "maintenance"'>
+            ⚖️ خطة الثبات والمحافظة (Maintenance)
+        </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         BULKING PLAN
+         ═══════════════════════════════════════════════════════════ -->
+    @if (selectedGoal == "bulking")
+    {
+        <div class="row g-4 anim-fade-up-d3">
+            <!-- Macros Summary -->
+            <div class="col-lg-4">
+                <div class="p-4 rounded h-100" style="background: #111111; border: 1px solid rgba(245,197,24,0.3);">
+                    <span class="badge-gold px-3 py-1 mb-3 d-inline-block">نظام تضخيم نظيف (Clean Bulk)</span>
+                    <h4 class="fw-bold text-white mb-3" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: #f5c518;">
+                        3,100 KCAL / DAY
+                    </h4>
+                    <p style="color: #9ca3af; font-size: 0.85rem;" class="mb-4">
+                        نظام مصمم لتوفير ماكروز عالية الجودة تحفّز التخليق البروتيني وتزيد الكتلة العضلية بدون زيادة دهون مفرطة.
+                    </p>
+
+                    <div class="d-flex flex-column gap-2 mb-4">
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: #181818;">
+                            <span style="color: #6b7280; font-size: 0.85rem;">🍗 البروتين (Protein)</span>
+                            <span class="fw-bold text-white font-monospace">190g (25%)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: #181818;">
+                            <span style="color: #6b7280; font-size: 0.85rem;">🍚 الكاربوهيدرات (Carbs)</span>
+                            <span class="fw-bold text-white font-monospace">380g (50%)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: #181818;">
+                            <span style="color: #6b7280; font-size: 0.85rem;">🥑 الدهون الصحية (Fats)</span>
+                            <span class="fw-bold text-white font-monospace">85g (25%)</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded" style="background: rgba(245,197,24,0.06); border: 1px solid rgba(245,197,24,0.2);">
+                        <div class="fw-bold mb-1" style="color: #f5c518; font-size: 0.82rem;">💡 نصيحة التضخيم:</div>
+                        <div style="color: #9ca3af; font-size: 0.78rem;">احرص على شرب 3-4 لتر ماء يومياً وتناول وجبة الكاربوهيدرات قبل التمرين بساعتين لأعلى طاقة.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meals Schedule -->
+            <div class="col-lg-8">
+                <div class="p-4 rounded" style="background: #111111; border: 1px solid rgba(255,255,255,0.07);">
+                    <h5 class="fw-bold text-white mb-4" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 1px;">
+                        <span style="color: #f5c518;">▎</span> جدول الوجبات اليومي لتضخيم العضلات
+                    </h5>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #f5c518;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">🍳 الوجبة 1: الإفطار الأساسي</span>
+                                <span class="badge-gold px-2 py-0.5" style="font-size: 0.7rem;">750 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                4 بيضات كاملة + 100g شوفان بالحليب والموز + ملعقة زبدة فول سوداني + عسل.
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #3b82f6;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">🍌 الوجبة 2: سناك قبل التمرين</span>
+                                <span class="badge-blue px-2 py-0.5" style="font-size: 0.7rem;">450 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                ثمرة موز كبيرة + أرز باللبن أو توست أسمر بالمربى وزبدة الفول السوداني + قهوة بدون سكر.
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #22c55e;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">🍗 الوجبة 3: الغداء بعد التمرين</span>
+                                <span class="badge-green px-2 py-0.5" style="font-size: 0.7rem;">950 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                200g صدور دجاج مشوية + 250g أرز أبيض أو بطاطس مسلوقة + طبق سلطة خضراء برياض زيت زيتون.
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #f59e0b;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">🥑 الوجبة 4: العشاء والاستشفاء</span>
+                                <span class="badge-amber px-2 py-0.5" style="font-size: 0.7rem;">600 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                150g لحم كاندوز مشفي أو تونة + 150g بطاطا حلوة + 200g جبن قريش وزيت زيتون قبل النوم.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ═══════════════════════════════════════════════════════════
+         CUTTING PLAN
+         ═══════════════════════════════════════════════════════════ -->
+    @if (selectedGoal == "cutting")
+    {
+        <div class="row g-4 anim-fade-up-d3">
+            <!-- Macros Summary -->
+            <div class="col-lg-4">
+                <div class="p-4 rounded h-100" style="background: #111111; border: 1px solid rgba(239,68,68,0.3);">
+                    <span class="badge-red px-3 py-1 mb-3 d-inline-block">نظام تنشيف وحرق دهون</span>
+                    <h4 class="fw-bold text-white mb-3" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: #ef4444;">
+                        1,950 KCAL / DAY
+                    </h4>
+                    <p style="color: #9ca3af; font-size: 0.85rem;" class="mb-4">
+                        عجز سعرات محسوب بدقة لإجبار الجسم على حرق الدهون المخزنة مع حماية العضلات من الهدم عبر بروتين عالي.
+                    </p>
+
+                    <div class="d-flex flex-column gap-2 mb-4">
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: #181818;">
+                            <span style="color: #6b7280; font-size: 0.85rem;">🍗 البروتين (Protein)</span>
+                            <span class="fw-bold text-white font-monospace">180g (37%)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: #181818;">
+                            <span style="color: #6b7280; font-size: 0.85rem;">🍚 الكاربوهيدرات (Carbs)</span>
+                            <span class="fw-bold text-white font-monospace">160g (33%)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: #181818;">
+                            <span style="color: #6b7280; font-size: 0.85rem;">🥑 الدهون الصحية (Fats)</span>
+                            <span class="fw-bold text-white font-monospace">55g (30%)</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded" style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2);">
+                        <div class="fw-bold mb-1" style="color: #ef4444; font-size: 0.82rem;">💡 نصيحة التنشيف:</div>
+                        <div style="color: #9ca3af; font-size: 0.78rem;">ركّز على الأغذية عالية الحجم وقليلة السعرات مثل الخضروات الورقية والبروتين الصافي للشعور بالشبع.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meals Schedule -->
+            <div class="col-lg-8">
+                <div class="p-4 rounded" style="background: #111111; border: 1px solid rgba(255,255,255,0.07);">
+                    <h5 class="fw-bold text-white mb-4" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 1px;">
+                        <span style="color: #ef4444;">▎</span> جدول وجبات التنشيف وخسارة الدهون
+                    </h5>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #ef4444;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">🍳 الوجبة 1: فطور مشبع</span>
+                                <span class="badge-red px-2 py-0.5" style="font-size: 0.7rem;">400 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                3 بيضات (1 كاملة + 2 بياض) + 50g شوفان بالماء أو حليب خال الدسم + خيار وطماطم.
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #f5c518;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">🍗 الوجبة 2: غداء دايت</span>
+                                <span class="badge-gold px-2 py-0.5" style="font-size: 0.7rem;">650 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                200g صدور دجاج مشوية أو سمك فيليه + 150g أرز بني أو مسلوق + سلطة خضراء كبيرة مع ليمون.
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #3b82f6;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">☕ الوجبة 3: سناك قبل التمرين</span>
+                                <span class="badge-blue px-2 py-0.5" style="font-size: 0.7rem;">250 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                تفاحة أو ثمرة كيوى + 15 حبة لوز نيء + قهوة إسبريسو بدون سكر.
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #22c55e;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">🥗 الوجبة 4: عشاء مشبع وقليل الكارب</span>
+                                <span class="badge-green px-2 py-0.5" style="font-size: 0.7rem;">400 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                علبة تونة مصفاة من الزيت أو 200g جبن قريش + طبق سلطة كبير برياض حبة البركة وزيت زيتون خفيف.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ═══════════════════════════════════════════════════════════
+         MAINTENANCE PLAN
+         ═══════════════════════════════════════════════════════════ -->
+    @if (selectedGoal == "maintenance")
+    {
+        <div class="row g-4 anim-fade-up-d3">
+            <div class="col-lg-4">
+                <div class="p-4 rounded h-100" style="background: #111111; border: 1px solid rgba(34,197,94,0.3);">
+                    <span class="badge-green px-3 py-1 mb-3 d-inline-block">نظام الثبات والمحافظة</span>
+                    <h4 class="fw-bold text-white mb-3" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: #22c55e;">
+                        2,450 KCAL / DAY
+                    </h4>
+                    <p style="color: #9ca3af; font-size: 0.85rem;" class="mb-4">
+                        نظام متوازن للمحافظة على الوزن الحالي ونسبة الدهون والكتلة العضلية مع طاقة ممتازة طوال اليوم.
+                    </p>
+
+                    <div class="d-flex flex-column gap-2 mb-4">
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: #181818;">
+                            <span style="color: #6b7280; font-size: 0.85rem;">🍗 البروتين (Protein)</span>
+                            <span class="fw-bold text-white font-monospace">160g (26%)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: #181818;">
+                            <span style="color: #6b7280; font-size: 0.85rem;">🍚 الكاربوهيدرات (Carbs)</span>
+                            <span class="fw-bold text-white font-monospace">270g (44%)</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center p-2 rounded" style="background: #181818;">
+                            <span style="color: #6b7280; font-size: 0.85rem;">🥑 الدهون الصحية (Fats)</span>
+                            <span class="fw-bold text-white font-monospace">70g (30%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="p-4 rounded" style="background: #111111; border: 1px solid rgba(255,255,255,0.07);">
+                    <h5 class="fw-bold text-white mb-4" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 1px;">
+                        <span style="color: #22c55e;">▎</span> جدول وجبات نظام المحافظة والتوازُن
+                    </h5>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #22c55e;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">🍳 الإفطار</span>
+                                <span class="badge-green px-2 py-0.5" style="font-size: 0.7rem;">550 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                3 بيضات + 2 توست أسمر + 50g جبن قريش + خضار فريش.
+                            </p>
+                        </div>
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #f5c518;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">🍗 الغداء</span>
+                                <span class="badge-gold px-2 py-0.5" style="font-size: 0.7rem;">850 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                200g لحم مشوي أو دجاج + 200g أرز أو معكرونة مسلوقة + خضار مطبوخ.
+                            </p>
+                        </div>
+                        <div class="p-3 rounded" style="background: #181818; border-right: 3px solid #3b82f6;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white" style="font-size: 0.95rem;">🥑 العشاء</span>
+                                <span class="badge-blue px-2 py-0.5" style="font-size: 0.7rem;">500 Kcal</span>
+                            </div>
+                            <p class="mb-0" style="color: #9ca3af; font-size: 0.85rem;">
+                                زبادي يوناني + مكسرات + ثمرة فاكهة.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string selectedGoal = "bulking";
+}

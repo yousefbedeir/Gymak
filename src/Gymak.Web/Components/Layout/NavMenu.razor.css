@@ -2,61 +2,61 @@
 .brand-icon {
     width: 38px;
     height: 38px;
-    background: #1e5adc;
-    border-radius: 8px;
+    background: #f5c518;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #000000;
     font-size: 1.2rem;
     flex-shrink: 0;
 }
 
 /* ─── Nav Links ─── */
 .nav-link-custom {
-    color: #9ca3af;
+    color: #6b7280;
     padding: 0.65rem 0.9rem;
-    border-radius: 0.4rem;
+    border-radius: 0.35rem;
     font-weight: 500;
-    font-size: 0.88rem;
+    font-size: 0.87rem;
     text-decoration: none;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
     border: 1px solid transparent;
-    letter-spacing: 0.01em;
+    position: relative;
+    overflow: hidden;
 }
 
 .nav-link-custom:hover {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.05);
+    color: #f5c518;
+    background: rgba(245, 197, 24, 0.06);
 }
 
 .nav-link-custom ::deep .nav-icon {
-    font-size: 1.05rem;
-    color: #4b5563;
-    transition: color 0.15s ease;
+    font-size: 1rem;
+    color: #374151;
+    transition: all 0.2s ease;
 }
 
 .nav-link-custom:hover ::deep .nav-icon {
-    color: #3b7ff5;
+    color: #f5c518;
 }
 
-/* ─── Active State ─── */
+/* ─── Active Link ─── */
 .nav-link-custom ::deep.active {
-    color: #ffffff;
-    background: #1e5adc;
+    color: #000000;
+    background: #f5c518;
     border-color: transparent;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .nav-link-custom ::deep.active .nav-icon {
-    color: #ffffff;
+    color: #000000;
 }
 
-/* ─── Section Titles ─── */
 .nav-section-title {
-    font-size: 0.62rem !important;
-    letter-spacing: 2px;
-    color: #374151 !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 2.5px;
+    color: #1f2937 !important;
 }
 
 @media (max-width: 767.98px) {

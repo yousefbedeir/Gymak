@@ -1,4 +1,5 @@
 @page "/login"
+@layout Layout.AuthLayout
 @using Gymak.Application.DTOs
 @using Gymak.Application.Services
 @using Gymak.Web.Identity
@@ -7,25 +8,25 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
 
-<PageTitle>Sign In — Gymak Fitness OS</PageTitle>
+<PageTitle>Sign In - GYMAK</PageTitle>
 
-<div class="d-flex align-items-center justify-content-center min-vh-100"
-     style="background: #111111;">
+<div class="d-flex align-items-center justify-content-center min-vh-100 anim-fade"
+     style="background: #080808;">
 
-    <div style="width: 100%; max-width: 420px; padding: 1rem;">
+    <div class="anim-fade-up" style="width: 100%; max-width: 420px; padding: 1.5rem;">
 
         <!-- Brand -->
         <div class="text-center mb-4">
             <div class="d-inline-flex align-items-center justify-content-center rounded mb-3"
-                 style="width: 52px; height: 52px; background: #1e5adc;">
-                <i class="bi bi-lightning-charge-fill text-white fs-3"></i>
+                 style="width: 56px; height: 56px; background: #f5c518; box-shadow: 0 4px 20px rgba(245,197,24,0.25);">
+                <i class="bi bi-lightning-charge-fill text-black fs-2"></i>
             </div>
-            <h2 class="fw-bold text-white mb-1" style="font-size: 1.6rem; letter-spacing: -0.5px;">GYMAK</h2>
-            <p style="color: #6b7280; font-size: 0.88rem;">Sign in to your account</p>
+            <h2 class="fw-bold text-white mb-1" style="font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 2px;">GYMAK</h2>
+            <p style="color: #6b7280; font-size: 0.85rem;">SIGN IN TO YOUR FITNESS ACCOUNT</p>
         </div>
 
         <!-- Card -->
-        <div class="p-4" style="background: #1a1a1a; border: 1px solid rgba(255,255,255,0.08); border-radius: 0.6rem;">
+        <div class="p-4" style="background: #111111; border: 1px solid rgba(255,255,255,0.08); border-radius: 0.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
 
             @if (!string.IsNullOrEmpty(errorMessage))
             {
@@ -40,10 +41,10 @@
                 <DataAnnotationsValidator />
 
                 <div class="mb-3">
-                    <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.82rem; font-weight: 500;">Email Address</label>
+                    <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Email Address</label>
                     <div class="d-flex align-items-center rounded"
-                         style="background: #111; border: 1px solid rgba(255,255,255,0.1); overflow: hidden;">
-                        <span class="px-3" style="color: #4b5563;"><i class="bi bi-envelope"></i></span>
+                         style="background: #181818; border: 1px solid rgba(255,255,255,0.1); overflow: hidden;">
+                        <span class="px-3" style="color: #6b7280;"><i class="bi bi-envelope"></i></span>
                         <input id="email" type="email" class="flex-grow-1 border-0 text-white bg-transparent py-2 pe-3"
                                style="outline: none; font-size: 0.88rem;"
                                placeholder="admin@gymak.com" @bind="loginInput.Email" required />
@@ -51,26 +52,23 @@
                 </div>
 
                 <div class="mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <label style="color: #9ca3af; font-size: 0.82rem; font-weight: 500;">Password</label>
-                        <a href="forgot-password" style="color: #3b7ff5; font-size: 0.8rem;">Forgot password?</a>
-                    </div>
+                    <label class="d-block mb-1" style="color: #9ca3af; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Password</label>
                     <div class="d-flex align-items-center rounded"
-                         style="background: #111; border: 1px solid rgba(255,255,255,0.1); overflow: hidden;">
-                        <span class="px-3" style="color: #4b5563;"><i class="bi bi-lock"></i></span>
+                         style="background: #181818; border: 1px solid rgba(255,255,255,0.1); overflow: hidden;">
+                        <span class="px-3" style="color: #6b7280;"><i class="bi bi-lock"></i></span>
                         <input id="password" type="password" class="flex-grow-1 border-0 text-white bg-transparent py-2 pe-3"
                                style="outline: none; font-size: 0.88rem;"
                                placeholder="••••••••" @bind="loginInput.Password" required />
                     </div>
                 </div>
 
-                <button type="submit" class="w-100 border-0 rounded py-2 fw-bold text-white d-flex align-items-center justify-content-center gap-2"
-                        style="background: #1e5adc; font-size: 0.9rem; letter-spacing: 0.3px; cursor: pointer; transition: background 0.2s;"
+                <button type="submit" class="w-100 border-0 rounded py-2.5 fw-bold text-black d-flex align-items-center justify-content-center gap-2"
+                        style="background: #f5c518; font-size: 0.88rem; letter-spacing: 1px; cursor: pointer; transition: all 0.2s;"
                         disabled="@isLoading">
                     @if (isLoading)
                     {
                         <span class="spinner-border spinner-border-sm"></span>
-                        <span>Signing in...</span>
+                        <span>SIGNING IN...</span>
                     }
                     else
                     {
@@ -81,21 +79,21 @@
             </EditForm>
 
             <!-- Demo Credentials -->
-            <div class="mt-4 p-3 rounded" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
-                <div class="mb-2" style="color: #374151; font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Demo Accounts</div>
+            <div class="mt-4 p-3 rounded" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);">
+                <div class="mb-2" style="color: #6b7280; font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;">Demo Accounts</div>
                 <div class="d-flex justify-content-between align-items-center mb-1">
                     <span class="px-2 py-0" style="background: rgba(239,68,68,0.15); color: #ef4444; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">Admin</span>
-                    <code style="color: #3b7ff5; font-size: 0.78rem; cursor: pointer;"
+                    <code style="color: #f5c518; font-size: 0.78rem; cursor: pointer;"
                           @onclick='() => FillCredentials("admin@gymak.com", "Admin123!")'>admin@gymak.com</code>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mb-1">
                     <span class="px-2 py-0" style="background: rgba(245,158,11,0.15); color: #f59e0b; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">Trainer</span>
-                    <code style="color: #3b7ff5; font-size: 0.78rem; cursor: pointer;"
+                    <code style="color: #f5c518; font-size: 0.78rem; cursor: pointer;"
                           @onclick='() => FillCredentials("trainer@gymak.com", "Trainer123!")'>trainer@gymak.com</code>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="px-2 py-0" style="background: rgba(34,197,94,0.15); color: #22c55e; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600;">Member</span>
-                    <code style="color: #3b7ff5; font-size: 0.78rem; cursor: pointer;"
+                    <code style="color: #f5c518; font-size: 0.78rem; cursor: pointer;"
                           @onclick='() => FillCredentials("member@gymak.com", "Member123!")'>member@gymak.com</code>
                 </div>
             </div>
@@ -103,7 +101,7 @@
 
         <p class="text-center mt-3" style="color: #6b7280; font-size: 0.85rem;">
             Don't have an account?
-            <a href="register" style="color: #3b7ff5; font-weight: 600;">Create account</a>
+            <a href="register" style="color: #f5c518; font-weight: 700;">Create account</a>
         </p>
     </div>
 </div>

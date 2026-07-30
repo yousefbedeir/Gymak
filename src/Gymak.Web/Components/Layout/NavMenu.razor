@@ -1,14 +1,14 @@
 <div class="sidebar-container d-flex flex-column h-100">
     <!-- Brand Header -->
     <div class="brand-header px-4 d-flex align-items-center justify-content-between"
-         style="border-bottom: 1px solid rgba(255,255,255,0.07); min-height: 64px;">
+         style="border-bottom: 1px solid rgba(255,255,255,0.06); min-height: 64px;">
         <a class="d-flex align-items-center gap-3 text-decoration-none" href="">
             <div class="brand-icon">
                 <i class="bi bi-lightning-charge-fill"></i>
             </div>
             <div>
-                <span class="fw-bold text-white d-block" style="font-size: 1.15rem; letter-spacing: -0.3px;">GYMAK</span>
-                <span class="fw-semibold text-uppercase d-block" style="font-size: 0.6rem; letter-spacing: 2px; color: #1e5adc;">FITNESS OS</span>
+                <span class="fw-bold text-white d-block" style="font-size: 1.1rem; letter-spacing: 1px; font-family: 'Bebas Neue', sans-serif;">GYMAK</span>
+                <span class="fw-semibold text-uppercase d-block" style="font-size: 0.58rem; letter-spacing: 2.5px; color: #f5c518;">TRAINING & NUTRITION</span>
             </div>
         </a>
         <button class="d-md-none text-white border-0 p-1 rounded"
@@ -33,21 +33,21 @@
                 </NavLink>
             </div>
             <div class="nav-item">
-                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="members">
-                    <i class="bi bi-people-fill nav-icon"></i>
-                    <span>Members</span>
-                </NavLink>
-            </div>
-            <div class="nav-item">
-                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="workouts">
+                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="exercises">
                     <i class="bi bi-activity nav-icon"></i>
-                    <span>Workouts</span>
+                    <span>Exercises & Systems</span>
                 </NavLink>
             </div>
             <div class="nav-item">
                 <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="nutrition">
                     <i class="bi bi-egg-fried nav-icon"></i>
-                    <span>Diet & Nutrition</span>
+                    <span>Nutrition & Diet</span>
+                </NavLink>
+            </div>
+            <div class="nav-item">
+                <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="coaches">
+                    <i class="bi bi-person-badge-fill nav-icon"></i>
+                    <span>Private Coaches</span>
                 </NavLink>
             </div>
             <div class="nav-item">
@@ -59,7 +59,7 @@
             <div class="nav-item">
                 <NavLink class="nav-link-custom d-flex align-items-center gap-3" href="progress-logs">
                     <i class="bi bi-graph-up nav-icon"></i>
-                    <span>Progress</span>
+                    <span>Progress Logs</span>
                 </NavLink>
             </div>
         </nav>
@@ -88,13 +88,13 @@
     </div>
 
     <!-- Footer -->
-    <div class="p-3" style="border-top: 1px solid rgba(255,255,255,0.07);">
+    <div class="p-3" style="border-top: 1px solid rgba(255,255,255,0.05);">
         <AuthorizeView>
             <Authorized>
                 <a href="profile" class="d-flex align-items-center gap-2 p-2 rounded text-decoration-none"
-                   style="background: rgba(30,90,220,0.1); border: 1px solid rgba(30,90,220,0.25); transition: all 0.2s;">
-                    <div class="d-flex align-items-center justify-content-center fw-bold text-white rounded flex-shrink-0"
-                         style="width: 36px; height: 36px; background: #1e5adc; font-size: 0.78rem;">
+                   style="background: rgba(245,197,24,0.08); border: 1px solid rgba(245,197,24,0.2); transition: all 0.2s;">
+                    <div class="d-flex align-items-center justify-content-center fw-bold text-black rounded flex-shrink-0"
+                         style="width: 36px; height: 36px; background: #f5c518; font-size: 0.78rem;">
                         @GetInitials(context.User.Identity?.Name)
                     </div>
                     <div class="overflow-hidden me-auto">
@@ -108,12 +108,12 @@
             </Authorized>
             <NotAuthorized>
                 <div class="d-flex flex-column gap-2">
-                    <a href="login" class="btn btn-sm fw-semibold rounded w-100"
-                       style="background: transparent; border: 1px solid rgba(30,90,220,0.5); color: #3b7ff5;">
+                    <a href="login" class="btn btn-sm fw-bold rounded w-100"
+                       style="background: transparent; border: 1px solid rgba(245,197,24,0.4); color: #f5c518;">
                         Sign In
                     </a>
                     <a href="register" class="btn btn-sm fw-bold rounded w-100"
-                       style="background: #1e5adc; color: white; border: none;">
+                       style="background: #f5c518; color: #000; border: none;">
                         Create Account
                     </a>
                 </div>

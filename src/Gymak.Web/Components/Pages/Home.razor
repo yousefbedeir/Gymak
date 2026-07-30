@@ -1,446 +1,115 @@
 @page "/"
-@using System.Security.Claims
-@using Gymak.Application.Services
-@using Gymak.Application.DTOs
-@using Gymak.Domain.Enums
-@using Microsoft.AspNetCore.Components.Authorization
-@inject IUserService UserService
-@inject ISubscriptionService SubscriptionService
-@inject IProgressLogService ProgressLogService
-@inject IPaymentService PaymentService
-@inject AuthenticationStateProvider AuthStateProvider
-@rendermode InteractiveServer
+@layout Layout.AuthLayout
 
-<PageTitle>Dashboard — Gymak Fitness OS</PageTitle>
+<PageTitle>GYMAK</PageTitle>
 
-@if (isLoading)
-{
-    <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 60vh;">
-        <div class="spinner-border" style="width: 2.5rem; height: 2.5rem; border-width: 3px; color: #1e5adc;" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-        <p class="text-muted mt-3 small">Loading Dashboard...</p>
-    </div>
-}
-else
-{
-    <!-- ═══ Hero Banner ═══ -->
-    <div class="hero-card p-4 p-md-5 mb-4">
-        <div class="row align-items-center" style="position: relative; z-index: 2;">
-            <div class="col-lg-8">
-                <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded mb-3"
-                     style="background: rgba(30,90,220,0.2); border: 1px solid rgba(30,90,220,0.4); font-size: 0.78rem;">
-                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #3b7ff5; display: inline-block;"></span>
-                    <span class="fw-semibold text-white">Gymak Fitness OS</span>
-                    <span style="color: rgba(255,255,255,0.3);">·</span>
-                    <span style="color: #9ca3af;">System Active</span>
-                </div>
-                <h2 class="fw-bold text-white mb-2" style="font-size: 2rem; letter-spacing: -0.5px;">
-                    Welcome back, <span style="color: #3b7ff5;">@(userName ?? "Admin")</span>!
-                </h2>
-                <p style="color: #9ca3af; max-width: 560px; font-size: 0.95rem; margin: 0;">
-                    Your real-time fitness management hub — member stats, subscriptions, and revenue all in one place.
-                </p>
-            </div>
-            <div class="col-lg-4 mt-4 mt-lg-0 text-lg-end">
-                <div class="d-inline-flex flex-column text-start p-3 rounded"
-                     style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);">
-                    <span class="small fw-medium mb-1" style="color: #6b7280;">
-                        <i class="bi bi-clock me-1" style="color: #3b7ff5;"></i>Current Time
-                    </span>
-                    <span class="fw-bold font-monospace text-white" style="font-size: 1.3rem;">@DateTime.Now.ToString("HH:mm")</span>
-                    <span style="font-size: 0.78rem; color: #6b7280;">@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</span>
-                </div>
-            </div>
-        </div>
+<section class="auth-home-shell">
+    <div class="auth-home-bg" aria-hidden="true">
+        <img src="/images/gym_cardio_treadmill.jpg" alt="" />
     </div>
 
-    <!-- ═══ KPI Cards ═══ -->
-    <div class="row g-3 mb-4">
-        <!-- Members -->
-        <div class="col-6 col-xl-3">
-            <div class="stat-card stat-card-blue h-100">
-                <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div class="stat-icon-box icon-box-blue">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                    <span class="badge-blue px-2 py-1 rounded" style="font-size: 0.72rem;">
-                        <i class="bi bi-arrow-up-short"></i>Members
-                    </span>
-                </div>
-                <div style="font-size: 2rem; font-weight: 800; color: #fff; line-height: 1;">@totalMembers</div>
-                <div class="small mt-1" style="color: #6b7280; font-weight: 500;">Total Registered</div>
-                <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.07);">
-                    <span class="small" style="color: #4b5563;">Member Roster</span>
-                    <a href="members" style="font-size: 0.8rem; color: #3b7ff5; text-decoration: none;">View →</a>
-                </div>
-            </div>
-        </div>
+    <nav class="auth-home-nav anim-fade">
+        <a class="auth-brand" href="">
+            <span class="auth-brand-mark">
+                <i class="bi bi-lightning-charge-fill"></i>
+            </span>
+            <span>
+                <strong>GYMAK</strong>
+                <small>TRAINING & NUTRITION</small>
+            </span>
+        </a>
 
-        <!-- Revenue -->
-        <div class="col-6 col-xl-3">
-            <div class="stat-card stat-card-green h-100">
-                <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div class="stat-icon-box icon-box-green">
-                        <i class="bi bi-cash-stack"></i>
-                    </div>
-                    <span class="badge-green px-2 py-1 rounded" style="font-size: 0.72rem;">
-                        <i class="bi bi-calendar-check"></i>This Month
-                    </span>
-                </div>
-                <div style="font-size: 2rem; font-weight: 800; color: #fff; line-height: 1;">$@monthlyRevenue.ToString("N0")</div>
-                <div class="small mt-1" style="color: #6b7280; font-weight: 500;">Revenue Logged</div>
-                <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.07);">
-                    <span class="small" style="color: #4b5563;">Completed Payments</span>
-                    <a href="subscriptions" style="font-size: 0.8rem; color: #22c55e; text-decoration: none;">View →</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Plans -->
-        <div class="col-6 col-xl-3">
-            <div class="stat-card stat-card-amber h-100">
-                <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div class="stat-icon-box icon-box-amber">
-                        <i class="bi bi-lightning-charge-fill"></i>
-                    </div>
-                    <span class="badge-amber px-2 py-1 rounded" style="font-size: 0.72rem;">
-                        <i class="bi bi-stars"></i>Active
-                    </span>
-                </div>
-                <div style="font-size: 2rem; font-weight: 800; color: #fff; line-height: 1;">@activePlans</div>
-                <div class="small mt-1" style="color: #6b7280; font-weight: 500;">Active Plans</div>
-                <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.07);">
-                    <span class="small" style="color: #4b5563;">Membership Tiers</span>
-                    <a href="subscriptions" style="font-size: 0.8rem; color: #f59e0b; text-decoration: none;">View →</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Progress Logs -->
-        <div class="col-6 col-xl-3">
-            <div class="stat-card stat-card-purple h-100">
-                <div class="d-flex align-items-start justify-content-between mb-3">
-                    <div class="stat-icon-box icon-box-purple">
-                        <i class="bi bi-graph-up-arrow"></i>
-                    </div>
-                    <span class="badge-red px-2 py-1 rounded" style="font-size: 0.72rem;">
-                        <i class="bi bi-activity"></i>Today
-                    </span>
-                </div>
-                <div style="font-size: 2rem; font-weight: 800; color: #fff; line-height: 1;">@todaysLogs</div>
-                <div class="small mt-1" style="color: #6b7280; font-weight: 500;">Progress Logs</div>
-                <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top: 1px solid rgba(255,255,255,0.07);">
-                    <span class="small" style="color: #4b5563;">Body Tracking</span>
-                    <a href="progress-logs" style="font-size: 0.8rem; color: #8b5cf6; text-decoration: none;">View →</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══ Quick Actions ═══ -->
-    <div class="gym-card p-4 mb-4">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-            <h6 class="fw-bold text-white mb-0" style="font-size: 0.9rem; letter-spacing: 0.3px;">
-                Quick Actions
-            </h6>
-            <span class="small" style="color: #4b5563; font-size: 0.78rem;">Shortcuts to key modules</span>
-        </div>
-        <div class="row g-2">
-            <div class="col-6 col-sm-4 col-lg-2">
-                <a href="members" class="quick-action-card flex-column text-center justify-content-center" style="min-height: 90px;">
-                    <i class="bi bi-person-plus-fill" style="font-size: 1.4rem; color: #3b7ff5; margin-bottom: 0.4rem;"></i>
-                    <div class="fw-semibold text-white" style="font-size: 0.82rem;">New Member</div>
-                    <div style="font-size: 0.7rem; color: #4b5563;">Add Client</div>
-                </a>
-            </div>
-            <div class="col-6 col-sm-4 col-lg-2">
-                <a href="subscriptions" class="quick-action-card flex-column text-center justify-content-center" style="min-height: 90px;">
-                    <i class="bi bi-credit-card-fill" style="font-size: 1.4rem; color: #22c55e; margin-bottom: 0.4rem;"></i>
-                    <div class="fw-semibold text-white" style="font-size: 0.82rem;">New Payment</div>
-                    <div style="font-size: 0.7rem; color: #4b5563;">Record Revenue</div>
-                </a>
-            </div>
-            <div class="col-6 col-sm-4 col-lg-2">
-                <a href="progress-logs" class="quick-action-card flex-column text-center justify-content-center" style="min-height: 90px;">
-                    <i class="bi bi-activity" style="font-size: 1.4rem; color: #8b5cf6; margin-bottom: 0.4rem;"></i>
-                    <div class="fw-semibold text-white" style="font-size: 0.82rem;">Log Progress</div>
-                    <div style="font-size: 0.7rem; color: #4b5563;">Body Metrics</div>
-                </a>
-            </div>
-            <div class="col-6 col-sm-4 col-lg-2">
-                <a href="workouts" class="quick-action-card flex-column text-center justify-content-center" style="min-height: 90px;">
-                    <i class="bi bi-lightning-fill" style="font-size: 1.4rem; color: #f59e0b; margin-bottom: 0.4rem;"></i>
-                    <div class="fw-semibold text-white" style="font-size: 0.82rem;">Workout Plan</div>
-                    <div style="font-size: 0.7rem; color: #4b5563;">Routine Builder</div>
-                </a>
-            </div>
-            <div class="col-6 col-sm-4 col-lg-2">
-                <a href="nutrition" class="quick-action-card flex-column text-center justify-content-center" style="min-height: 90px;">
-                    <i class="bi bi-egg-fried" style="font-size: 1.4rem; color: #ef4444; margin-bottom: 0.4rem;"></i>
-                    <div class="fw-semibold text-white" style="font-size: 0.82rem;">Diet Plan</div>
-                    <div style="font-size: 0.7rem; color: #4b5563;">Nutrition</div>
-                </a>
-            </div>
-            <div class="col-6 col-sm-4 col-lg-2">
-                <a href="users" class="quick-action-card flex-column text-center justify-content-center" style="min-height: 90px;">
-                    <i class="bi bi-shield-check" style="font-size: 1.4rem; color: #3b7ff5; margin-bottom: 0.4rem;"></i>
-                    <div class="fw-semibold text-white" style="font-size: 0.82rem;">User Access</div>
-                    <div style="font-size: 0.7rem; color: #4b5563;">Roles & Perms</div>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══ Payments & Subscriptions ═══ -->
-    <div class="row g-4 mb-4">
-        <!-- Recent Payments -->
-        <div class="col-lg-7">
-            <div class="gym-card p-4 h-100">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <div>
-                        <h5 class="fw-bold text-white mb-0" style="font-size: 1rem;">
-                            <i class="bi bi-receipt-cutoff me-2" style="color: #22c55e;"></i>Recent Payments
-                        </h5>
-                        <p class="small mb-0" style="color: #6b7280;">Latest completed member payments</p>
-                    </div>
-                    <a href="subscriptions" class="btn btn-sm fw-semibold rounded px-3"
-                       style="background: #1e5adc; color: white; border: none; font-size: 0.8rem;">
-                        View All <i class="bi bi-arrow-right ms-1"></i>
+        <div class="auth-nav-actions">
+            <AuthorizeView>
+                <Authorized>
+                    <a class="auth-nav-link" href="profile">Profile</a>
+                    <a class="auth-nav-button" href="subscriptions">
+                        <i class="bi bi-speedometer2"></i>
+                        <span>Open App</span>
                     </a>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="table table-dark-custom mb-0">
-                        <thead>
-                            <tr>
-                                <th>Member</th>
-                                <th>Amount</th>
-                                <th>Method</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (!recentPayments.Any())
-                            {
-                                <tr>
-                                    <td colspan="4" class="text-center py-5" style="color: #4b5563;">
-                                        <i class="bi bi-inbox d-block mb-2" style="font-size: 2rem; color: #374151;"></i>
-                                        No recent payment records found
-                                    </td>
-                                </tr>
-                            }
-                            @foreach (var payment in recentPayments)
-                            {
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <div class="d-flex align-items-center justify-content-center fw-bold text-white rounded"
-                                                 style="width: 34px; height: 34px; background: #1e5adc; font-size: 0.75rem; flex-shrink: 0;">
-                                                @GetInitials(payment.UserName)
-                                            </div>
-                                            <div>
-                                                <div class="fw-semibold text-white" style="font-size: 0.88rem;">@payment.UserName</div>
-                                                <div style="font-size: 0.72rem; color: #4b5563;">Ref: @payment.PaymentId.ToString()[..8].ToUpper()</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="fw-bold font-monospace" style="color: #22c55e;">$@payment.Amount.ToString("N2")</span>
-                                    </td>
-                                    <td>
-                                        <span class="px-2 py-1 rounded small" style="background: #1e1e1e; border: 1px solid rgba(255,255,255,0.1); color: #9ca3af; font-size: 0.78rem;">
-                                            @payment.PaymentMethod
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span class="badge-green px-2 py-1 rounded" style="font-size: 0.75rem;">
-                                            <i class="bi bi-check-circle-fill me-1"></i>@payment.Status
-                                        </span>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Active Subscriptions -->
-        <div class="col-lg-5">
-            <div class="gym-card p-4 h-100">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <div>
-                        <h5 class="fw-bold text-white mb-0" style="font-size: 1rem;">
-                            <i class="bi bi-credit-card-fill me-2" style="color: #3b7ff5;"></i>Active Memberships
-                        </h5>
-                        <p class="small mb-0" style="color: #6b7280;">Current active subscriptions</p>
-                    </div>
-                    <a href="subscriptions" class="btn btn-sm fw-semibold rounded px-3"
-                       style="background: #1e5adc; color: white; border: none; font-size: 0.8rem;">
-                        View All
+                </Authorized>
+                <NotAuthorized>
+                    <a class="auth-nav-link" href="login">Sign In</a>
+                    <a class="auth-nav-button" href="register">
+                        <i class="bi bi-person-plus-fill"></i>
+                        <span>Register</span>
                     </a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </nav>
+
+    <div class="auth-home-content">
+        <div class="auth-copy">
+            <div class="auth-eyebrow anim-fade-up">
+                <i class="bi bi-shield-check"></i>
+                Training and nutrition guide
+            </div>
+
+            <div class="auth-title anim-fade-up-d1" role="heading" aria-level="1">GYMAK</div>
+
+            <p class="auth-lede anim-fade-up-d2">
+                منصتك للتعرف على التمارين المناسبة لكل عضلة، وفهم الاغذية التي تساعدك تبني جسمك بذكاء.
+                تابع خطتك، اكتشف اختيارات غذائية افضل، وخلي كل خطوة في تمرينك واضحة ومنظمة.
+            </p>
+
+            <AuthorizeView>
+                <Authorized>
+                    <div class="auth-cta-row anim-fade-up-d3">
+                        <a class="auth-primary-btn" href="profile">
+                            <i class="bi bi-person-circle"></i>
+                            <span>My Profile</span>
+                        </a>
+                        <a class="auth-secondary-btn" href="subscriptions">
+                            <i class="bi bi-credit-card-fill"></i>
+                            <span>Subscriptions</span>
+                        </a>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="auth-cta-row anim-fade-up-d3">
+                        <a class="auth-primary-btn" href="login">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            <span>Sign In</span>
+                        </a>
+                        <a class="auth-secondary-btn" href="register">
+                            <i class="bi bi-person-plus-fill"></i>
+                            <span>Create Account</span>
+                        </a>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
+        <div class="auth-visual-stage" aria-label="Gymak access preview">
+            <div class="auth-photo auth-photo-main anim-fade-up-d2">
+                <img src="/images/gym_cardio_group.jpg" alt="Young man and woman running on treadmills" />
+                <span>CARDIO ZONE</span>
+            </div>
+
+            <div class="auth-photo auth-photo-side anim-fade-up-d4">
+                <img src="/images/gym_cardio_treadmill.jpg" alt="Modern cardio gym with treadmill runners" />
+                <span>GROUP CARDIO</span>
+            </div>
+
+            <div class="auth-status-panel anim-fade-up-d5">
+                <div>
+                    <small>AUTH STATUS</small>
+                    <strong>READY</strong>
                 </div>
-
-                @if (!activeSubscriptions.Any())
-                {
-                    <div class="text-center py-5" style="color: #4b5563;">
-                        <i class="bi bi-card-heading d-block mb-2" style="font-size: 2rem; color: #374151;"></i>
-                        <p class="small mb-0">No active subscriptions running</p>
-                    </div>
-                }
-                else
-                {
-                    <div class="d-flex flex-column gap-3">
-                        @foreach (var sub in activeSubscriptions)
-                        {
-                            var daysLeft = (int)(sub.EndDate - DateTime.UtcNow).TotalDays;
-                            var totalDays = Math.Max((sub.EndDate - sub.StartDate).TotalDays, 1);
-                            var progressPct = Math.Clamp((int)(100.0 - daysLeft * 100.0 / totalDays), 0, 100);
-                            var barColor = daysLeft > 14 ? "#1e5adc" : daysLeft > 7 ? "#f59e0b" : "#ef4444";
-                            var textColor = daysLeft > 14 ? "#3b7ff5" : daysLeft > 7 ? "#f59e0b" : "#ef4444";
-
-                            <div class="p-3 rounded" style="background: #1e1e1e; border: 1px solid rgba(255,255,255,0.07);">
-                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="d-flex align-items-center justify-content-center fw-bold text-white rounded"
-                                             style="width: 32px; height: 32px; background: #1e5adc; font-size: 0.72rem; flex-shrink: 0;">
-                                            @GetInitials(sub.UserName)
-                                        </div>
-                                        <div>
-                                            <div class="fw-semibold text-white small">@sub.UserName</div>
-                                            <div style="font-size: 0.72rem; color: #6b7280;">@sub.PlanName</div>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <div class="fw-bold font-monospace small" style="color: @textColor;">@daysLeft days left</div>
-                                        <div style="font-size: 0.72rem; color: #6b7280;">$@sub.Price / plan</div>
-                                    </div>
-                                </div>
-                                <div class="rounded-pill overflow-hidden" style="height: 4px; background: rgba(255,255,255,0.06);">
-                                    <div class="rounded-pill" style="width: @progressPct%; height: 100%; background: @barColor;"></div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
+                <i class="bi bi-lock-fill"></i>
             </div>
         </div>
     </div>
 
-    <!-- ═══ Membership Plans ═══ -->
-    <div class="gym-card p-4">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <div>
-                <h5 class="fw-bold text-white mb-0" style="font-size: 1rem;">
-                    <i class="bi bi-stars me-2" style="color: #f59e0b;"></i>Membership Plans
-                </h5>
-                <p class="small mb-0" style="color: #6b7280;">Available gym subscription packages</p>
-            </div>
-            <a href="subscriptions" class="btn btn-sm fw-semibold rounded px-3"
-               style="background: transparent; border: 1px solid rgba(30,90,220,0.5); color: #3b7ff5; font-size: 0.8rem;">
-                <i class="bi bi-gear-fill me-1"></i>Manage Plans
-            </a>
-        </div>
-
-        @if (!plans.Any())
-        {
-            <div class="text-center py-4" style="color: #4b5563;">
-                <p class="small mb-0">No plans defined. <a href="subscriptions" style="color: #3b7ff5;">Create plans →</a></p>
-            </div>
-        }
-        else
-        {
-            <div class="row g-3">
-                @foreach (var plan in plans)
-                {
-                    <div class="col-sm-6 col-lg-4">
-                        <div class="p-3 rounded h-100 d-flex flex-column"
-                             style="background: #1e1e1e; border: 1px solid rgba(255,255,255,0.07); transition: border-color 0.2s;">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="badge-blue px-2 py-1 rounded" style="font-size: 0.72rem;">@plan.BillingCycle</span>
-                                <span class="badge-green px-2 py-1 rounded" style="font-size: 0.72rem;">@plan.DurationDays Days</span>
-                            </div>
-                            <h6 class="fw-bold text-white mb-1" style="font-size: 0.95rem;">@plan.Name</h6>
-                            <p class="small flex-grow-1 mb-3" style="color: #6b7280; font-size: 0.82rem;">@(plan.Description ?? "Full facility access package")</p>
-                            <div class="d-flex align-items-end justify-content-between pt-2"
-                                 style="border-top: 1px solid rgba(255,255,255,0.07);">
-                                <div>
-                                    <div style="font-size: 0.7rem; color: #6b7280;">Price</div>
-                                    <span class="fw-bold font-monospace" style="color: #3b7ff5; font-size: 1.4rem;">$@plan.Price</span>
-                                </div>
-                                <a href="subscriptions" class="btn btn-sm rounded fw-semibold"
-                                   style="background: #1e5adc; color: white; border: none; font-size: 0.8rem;">Details</a>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
+    <div class="auth-feature-strip anim-fade-up-d5">
+        <a href="login">
+            <i class="bi bi-box-arrow-in-right"></i>
+            <span>Sign In</span>
+        </a>
+        <a href="register">
+            <i class="bi bi-person-plus-fill"></i>
+            <span>Create Account</span>
+        </a>
     </div>
-}
-
-@code {
-    private bool isLoading = true;
-    private string? userName;
-
-    private int totalMembers;
-    private decimal monthlyRevenue;
-    private int activePlans;
-    private int todaysLogs;
-
-    private List<PaymentDto> recentPayments = new();
-    private List<SubscriptionDto> activeSubscriptions = new();
-    private List<SubscriptionPlanDto> plans = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity?.IsAuthenticated == true)
-            {
-                userName = authState.User.Identity.Name;
-            }
-
-            var members = await UserService.GetUsersByRoleAsync(UserRole.Member);
-            totalMembers = members.Count;
-
-            var allPlans = await SubscriptionService.GetAllPlansAsync(activeOnly: false);
-            plans = allPlans.ToList();
-            activePlans = allPlans.Count(p => p.IsActive);
-
-            var subs = await SubscriptionService.GetAllSubscriptionsAsync();
-            activeSubscriptions = subs
-                .Where(s => s.Status == Domain.Enums.SubscriptionStatus.Active)
-                .OrderBy(s => s.EndDate)
-                .Take(5)
-                .ToList();
-
-            var payments = await PaymentService.GetAllPaymentsAsync();
-            recentPayments = payments.Take(5).ToList();
-
-            var now = DateTime.UtcNow;
-            monthlyRevenue = payments
-                .Where(p => p.Status == Domain.Enums.PaymentStatus.Completed
-                         && p.PaymentDate.Year == now.Year
-                         && p.PaymentDate.Month == now.Month)
-                .Sum(p => p.Amount);
-
-            todaysLogs = 0;
-        }
-        catch { }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    private static string GetInitials(string? fullName)
-    {
-        if (string.IsNullOrWhiteSpace(fullName)) return "U";
-        var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length == 1) return parts[0][..1].ToUpper();
-        return (parts[0][..1] + parts[^1][..1]).ToUpper();
-    }
-}
+</section>
